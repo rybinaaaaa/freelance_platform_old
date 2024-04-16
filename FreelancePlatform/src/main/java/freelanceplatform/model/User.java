@@ -3,7 +3,6 @@ package freelanceplatform.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,22 +15,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @NoArgsConstructor
 public class User extends AbstractEntity{
 
-    @Column(nullable = false)
-    protected String firstName;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
+    private String username;
+    @Column
+    private String firstName;
+    @Column
     private String lastName;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false)
     private String password;
     @Column
     private int rating;
 
-    public User(String firstName, String lastName, String email, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
+    public User(String username, String password, String email) {
+        this.username = username;
         this.password = password;
+        this.email = email;
     }
 
     public void encodePassword(PasswordEncoder encoder) {
