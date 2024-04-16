@@ -2,14 +2,18 @@ package freelanceplatform.model;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class Task extends AbstractEntity{
 
     @ManyToOne
@@ -19,6 +23,9 @@ public class Task extends AbstractEntity{
     @ManyToOne
     @JoinColumn(name = "freelancer_id")
     private Freelancer freelancer;
+
+    @Column(nullable = false)
+    private String title;
 
     @Column(nullable = false)
     private String problem;

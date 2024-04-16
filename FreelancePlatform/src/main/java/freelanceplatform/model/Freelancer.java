@@ -19,4 +19,5 @@ public class Freelancer extends User{
 
     @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
     private List<Task> takenTasks;
+
 }

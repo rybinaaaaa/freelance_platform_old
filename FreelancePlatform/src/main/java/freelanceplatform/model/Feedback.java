@@ -14,16 +14,17 @@ import lombok.EqualsAndHashCode;
 public class Feedback extends AbstractEntity{
 
     @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User from;
 
     @ManyToOne
-    @JoinColumn(name = "freelancer_id", nullable = false)
-    private Freelancer freelancer;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User to;
 
     @Column(nullable = false)
     private Integer rating;
 
     @Column
     private String comment;
+
 }
