@@ -1,8 +1,6 @@
 package freelanceplatform.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,19 +15,30 @@ public class User extends AbstractEntity{
 
     @Column(nullable = false, unique = true)
     private String username;
-    @Column
+
+    @Column(nullable = false)
     private String firstName;
-    @Column
+
+    @Column(nullable = false)
     private String lastName;
+
     @Column(nullable = false, unique = true)
     private String email;
+
     @Column(nullable = false)
     private String password;
+
     @Column
     private int rating;
 
-    public User(String username, String password, String email) {
+    @OneToOne
+    @JoinColumn(name = "resume_id")
+    private Resume resume;
+
+    public User(String username, String firstName, String lastName, String password, String email) {
         this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.password = password;
         this.email = email;
     }
