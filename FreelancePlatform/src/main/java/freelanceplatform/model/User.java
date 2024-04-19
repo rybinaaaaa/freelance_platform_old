@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -31,9 +33,22 @@ public class User extends AbstractEntity{
     @Column
     private int rating;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
+
     @OneToOne
     @JoinColumn(name = "resume_id")
     private Resume resume;
+
+    @OneToMany(mappedBy = "customer")
+    private List<Task> postedTasks;
+
+    @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
+    private List<Proposal> proposals;
+
+    @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
+    private List<Task> takenTasks;
 
     public User(String username, String firstName, String lastName, String password, String email) {
         this.username = username;

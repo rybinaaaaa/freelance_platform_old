@@ -1,9 +1,7 @@
 package freelanceplatform.dto.entityCreationDTO;
 
-
-import freelanceplatform.model.Customer;
-import freelanceplatform.model.Freelancer;
 import freelanceplatform.model.TaskStatus;
+import freelanceplatform.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,8 +12,8 @@ import java.util.Date;
 @AllArgsConstructor
 public class PostedTaskCreationDTO {
 
-    private Customer customer;
-    private Freelancer freelancer;
+    private User customer;
+    private User freelancer;
     private String title;
     private String problem;
     private Date deadline;

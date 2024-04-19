@@ -18,11 +18,11 @@ public class Task extends AbstractEntity{
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    private User customer;
 
     @ManyToOne
     @JoinColumn(name = "freelancer_id")
-    private Freelancer freelancer;
+    private User freelancer;
 
     @Column(nullable = false)
     private String title;
