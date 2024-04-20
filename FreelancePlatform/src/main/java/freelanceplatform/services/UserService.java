@@ -1,6 +1,7 @@
 package freelanceplatform.services;
 
 import freelanceplatform.data.UserRepository;
+import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -26,13 +28,17 @@ public class UserService {
     @Transactional
     public User find(Integer id) {
         Objects.requireNonNull(id);
-        return userRepository.findById(id).orElse(null);
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) throw new NotFoundException("User with id " + id + " not found");
+        return userOptional.get();
     }
 
     @Transactional
     public User findByUsername(String username) {
         Objects.requireNonNull(username);
-        return userRepository.getByUsername(username);
+        Optional<User> userOptional = userRepository.getByUsername(username);
+        if (userOptional.isEmpty()) throw new NotFoundException("User with username " + username + " not found");
+        return userOptional.get();
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package freelanceplatform.services;
 
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.environment.Generator;
+import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Role;
 import freelanceplatform.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,10 +42,21 @@ public class UserServiceTest {
     @Test
     public void updateUserActuallyUpdates() {
         userService.save(user);
-        User newUser = userRepository.getByUsername(user.getUsername());
+        Optional<User> newUserOptional = userRepository.getByUsername(user.getUsername());
+        User newUser = newUserOptional.get();
         newUser.setFirstName("Test");
         userService.update(newUser);
 
-        assertEquals("Test", userRepository.getByUsername(user.getUsername()).getFirstName());
+        assertEquals("Test", userRepository.getByUsername(user.getUsername()).get().getFirstName());
+    }
+
+    @Test
+    public void findUserThrowsExceptionIfUserNotFound() {
+        assertThrows(NotFoundException.class, () -> userService.find(10));
+    }
+
+    @Test
+    public void findUserByUsernameThrowsExceptionIfUserNotFound() {
+        assertThrows(NotFoundException.class, () -> userService.findByUsername("test"));
     }
 }
