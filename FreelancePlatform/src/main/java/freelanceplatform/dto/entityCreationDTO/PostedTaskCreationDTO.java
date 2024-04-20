@@ -2,7 +2,6 @@ package freelanceplatform.dto.entityCreationDTO;
 
 import freelanceplatform.model.TaskStatus;
 import freelanceplatform.model.User;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

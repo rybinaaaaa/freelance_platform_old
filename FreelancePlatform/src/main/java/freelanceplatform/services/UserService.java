@@ -5,7 +5,6 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
