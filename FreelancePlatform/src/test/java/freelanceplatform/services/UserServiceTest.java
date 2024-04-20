@@ -39,10 +39,10 @@ public class UserServiceTest {
     @Test
     public void updateUserActuallyUpdates() {
         userService.save(user);
-        User newUser = userRepository.getByUsername(user.getUsername());
+        User newUser = userRepository.getByUsername(user.getUsername()).get();
         newUser.setFirstName("Test");
         userService.update(newUser);
 
-        assertEquals("Test", userRepository.getByUsername(user.getUsername()).getFirstName());
+        assertEquals("Test", userRepository.getByUsername(user.getUsername()).get().getFirstName());
     }
 }
