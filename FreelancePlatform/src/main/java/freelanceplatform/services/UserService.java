@@ -22,19 +22,19 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public User get(Integer id) {
         Objects.requireNonNull(id);
         return userRepo.findById(id).orElse(null);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public User getByUsername(String username) {
         Objects.requireNonNull(username);
         return userRepo.getByUsername(username);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Iterable<User> getAll() {
         return userRepo.findAll();
     }
@@ -65,8 +65,6 @@ public class UserService {
             userRepo.delete(user);
         }
     }
-
-
 
     public boolean exists(Integer id){
         Objects.requireNonNull(id);

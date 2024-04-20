@@ -10,6 +10,7 @@ import freelanceplatform.model.TaskStatus;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -27,6 +28,7 @@ public class TaskService {
         this.userRepo = userRepo;
     }
 
+    @Transactional
     public void save(Task task){
         Objects.requireNonNull(task);
         task.setStatus(TaskStatus.UNASSIGNED);
@@ -34,6 +36,7 @@ public class TaskService {
         taskRepo.save(task);
     }
 
+    @Transactional(readOnly = true)
     public Task get(Integer id){
         Objects.requireNonNull(id);
         Optional<Task> task = taskRepo.findById(id);
@@ -41,18 +44,22 @@ public class TaskService {
         return task.get();
     }
 
+    @Transactional(readOnly = true)
     public Iterable<Task> getAllUnassigned(){
         return taskRepo.findAllByStatus(TaskStatus.UNASSIGNED);
     }
 
+    @Transactional(readOnly = true)
     public Iterable<Task> getAllAssigned(){
         return taskRepo.findAllByStatus(TaskStatus.ASSIGNED);
     }
 
+    @Transactional(readOnly = true)
     public Iterable<Task> getAllSubmitted(){
         return taskRepo.findAllByStatus(TaskStatus.SUBMITTED);
     }
 
+    @Transactional(readOnly = true)
     public Iterable<Task> getAllAccepted(){
         return taskRepo.findAllByStatus(TaskStatus.ACCEPTED);
     }
@@ -62,6 +69,7 @@ public class TaskService {
         return taskRepo.existsById(id);
     }
 
+    @Transactional
     public void update(Task task){
         Objects.requireNonNull(task);
         if (exists(task.getId())) {
@@ -72,6 +80,7 @@ public class TaskService {
         }
     }
 
+    @Transactional
     public void delete(Task task){
         Objects.requireNonNull(task);
         if (exists(task.getId())) {
@@ -86,6 +95,7 @@ public class TaskService {
         }
     }
 
+    @Transactional
     public void assign(Task task, User freelancer){
         Objects.requireNonNull(task);
         Objects.requireNonNull(freelancer);
@@ -98,6 +108,7 @@ public class TaskService {
         userRepo.save(freelancer);
     }
 
+    @Transactional
     public void submit(Task task){
         Objects.requireNonNull(task);
         task.setStatus(TaskStatus.SUBMITTED);
@@ -106,6 +117,7 @@ public class TaskService {
         taskRepo.save(task);
     }
 
+    @Transactional
     public void refuse(Task task){
         Objects.requireNonNull(task);
         if (task.getAssignedDate().equals(LocalDate.now())){
@@ -121,6 +133,7 @@ public class TaskService {
         }
     }
 
+    @Transactional
     public void accept(Task task){
         Objects.requireNonNull(task);
         task.setStatus(TaskStatus.ACCEPTED);
@@ -128,6 +141,7 @@ public class TaskService {
         taskRepo.save(task);
     }
 
+    @Transactional
     public void returnWithRevisions(Task task, String revisions){
         Objects.requireNonNull(task);
         Objects.requireNonNull(revisions);
