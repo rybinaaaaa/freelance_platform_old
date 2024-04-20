@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends CrudRepository<User, Integer> {
 
     boolean existsByUsername(String username);
+
+    User getByUsername(String username);
 }

@@ -34,7 +34,7 @@ public class User extends AbstractEntity{
     private int rating;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(name = "role",nullable = false)
     private Role role;
 
     @OneToOne

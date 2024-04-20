@@ -14,11 +14,11 @@ import lombok.EqualsAndHashCode;
 public class Feedback extends AbstractEntity{
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id_from", nullable = false)
     private User from;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id_to", nullable = false)
     private User to;
 
     @Column(nullable = false)

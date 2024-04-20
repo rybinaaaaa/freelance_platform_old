@@ -30,6 +30,12 @@ public class UserService {
     }
 
     @Transactional
+    public User findByUsername(String username) {
+        Objects.requireNonNull(username);
+        return userRepository.getByUsername(username);
+    }
+
+    @Transactional
     public Iterable<User> findAll() {
         return userRepository.findAll();
     }
