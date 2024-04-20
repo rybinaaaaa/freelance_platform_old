@@ -4,7 +4,6 @@ import freelanceplatform.data.UserRepository;
 import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,41 +12,41 @@ import java.util.Objects;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserRepository userRepo;
 
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
+    public UserService(UserRepository userRepo, PasswordEncoder passwordEncoder) {
+        this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
-    public User find(Integer id) {
+    public User get(Integer id) {
         Objects.requireNonNull(id);
-        return userRepository.findById(id).orElse(null);
+        return userRepo.findById(id).orElse(null);
     }
 
     @Transactional
-    public User findByUsername(String username) {
+    public User getByUsername(String username) {
         Objects.requireNonNull(username);
-        return userRepository.getByUsername(username);
+        return userRepo.getByUsername(username);
     }
 
     @Transactional
-    public Iterable<User> findAll() {
-        return userRepository.findAll();
+    public Iterable<User> getAll() {
+        return userRepo.findAll();
     }
 
     @Transactional
     public void save(User user){
         Objects.requireNonNull(user);
-        if (userRepository.existsByUsername(user.getUsername())) {
+        if (userRepo.existsByUsername(user.getUsername())) {
             throw new ValidationException("This user already exists");
         }
         user.encodePassword(passwordEncoder);
-        userRepository.save(user);
+        userRepo.save(user);
     }
 
     @Transactional
@@ -55,7 +54,7 @@ public class UserService {
         Objects.requireNonNull(user);
         if (exists(user.getId())) {
             user.encodePassword(passwordEncoder);
-            userRepository.save(user);
+            userRepo.save(user);
         }
     }
 
@@ -63,7 +62,7 @@ public class UserService {
     public void delete(User user){
         Objects.requireNonNull(user);
         if (exists(user.getId())) {
-            userRepository.delete(user);
+            userRepo.delete(user);
         }
     }
 
@@ -71,7 +70,7 @@ public class UserService {
 
     public boolean exists(Integer id){
         Objects.requireNonNull(id);
-        return userRepository.existsById(id);
+        return userRepo.existsById(id);
     }
 
 }

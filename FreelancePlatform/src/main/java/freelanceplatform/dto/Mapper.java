@@ -45,7 +45,6 @@ public class Mapper {
                 taskDTO.getTitle(),
                 taskDTO.getProblem(),
                 taskDTO.getDeadline(),
-                taskDTO.getStatus(),
                 taskDTO.getPayment());
     }
 

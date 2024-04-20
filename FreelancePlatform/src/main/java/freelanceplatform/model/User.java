@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -62,4 +63,18 @@ public class User extends AbstractEntity{
     public void encodePassword(PasswordEncoder encoder) {
         this.password = encoder.encode(password);
     }
+
+    public void addTaskToPosted(Task task){
+        if (postedTasks==null) postedTasks = new ArrayList<>();
+        this.postedTasks.add(task);
+    }
+
+    public void addTaskToTaken(Task task){
+        if (takenTasks==null) takenTasks = new ArrayList<>();
+        this.takenTasks.add(task);
+    }
+
+    public void removePostedTask(Task task){this.postedTasks.remove(task);}
+
+    public void removeTakenTask(Task task){this.takenTasks.remove(task);}
 }

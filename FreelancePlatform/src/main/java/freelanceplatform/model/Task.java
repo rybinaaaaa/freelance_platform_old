@@ -1,20 +1,18 @@
 package freelanceplatform.model;
 
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
-public class Task extends AbstractEntity{
+public class Task extends AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
@@ -39,4 +37,23 @@ public class Task extends AbstractEntity{
 
     @Column(nullable = false)
     private Double payment;
+
+    @Column
+    private LocalDate assignedDate;
+
+    @Column
+    private LocalDate submittedDate;
+
+    @Column
+    private String revisions;
+
+    public Task(User customer, User freelancer, String title, String problem, Date deadline, Double payment) {
+        this.customer = customer;
+        this.freelancer = freelancer;
+        this.title = title;
+        this.problem = problem;
+        this.deadline = deadline;
+        this.status = TaskStatus.UNASSIGNED;
+        this.payment = payment;
+    }
 }
