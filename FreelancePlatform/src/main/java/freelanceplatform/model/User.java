@@ -50,12 +50,13 @@ public class User extends AbstractEntity{
     @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
     private List<Task> takenTasks;
 
-    public User(String username, String firstName, String lastName, String password, String email) {
+    public User(String username, String firstName, String lastName, String email, String password, Role role) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = password;
         this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
     public void encodePassword(PasswordEncoder encoder) {

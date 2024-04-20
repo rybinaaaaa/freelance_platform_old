@@ -1,5 +1,6 @@
 package freelanceplatform.dto.entityCreationDTO;
 
+import freelanceplatform.model.Role;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,5 +15,6 @@ public class UserCreationDTO {
     private final String lastName;
     private final String email;
     private final String password;
+    private final Role role;
 
 }

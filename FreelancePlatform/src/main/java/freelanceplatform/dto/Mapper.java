@@ -18,7 +18,7 @@ public class Mapper {
 
     public User userDTOToUser(UserCreationDTO userDTO){
         return new User(userDTO.getUsername(), userDTO.getFirstName(),
-                userDTO.getLastName(), userDTO.getEmail(), userDTO.getPassword());
+                userDTO.getLastName(), userDTO.getEmail(), userDTO.getPassword(), userDTO.getRole());
     }
 
     public ProposalDTO proposalToDTO(Proposal proposal){
