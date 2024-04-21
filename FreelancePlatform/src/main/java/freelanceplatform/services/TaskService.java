@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -85,7 +87,7 @@ public class TaskService {
         Objects.requireNonNull(task);
         if (exists(task.getId())) {
             task.getCustomer().removePostedTask(task);
-            task.getFreelancer().removeTakenTask(task);
+            if (task.getFreelancer()!=null) task.getFreelancer().removeTakenTask(task);
             task.setStatus(TaskStatus.DELETED);
             userRepo.save(task.getCustomer());
             userRepo.save(task.getFreelancer());
@@ -101,7 +103,7 @@ public class TaskService {
         Objects.requireNonNull(freelancer);
         task.setStatus(TaskStatus.ASSIGNED);
         task.setFreelancer(freelancer);
-        task.setAssignedDate(LocalDate.now());
+        task.setAssignedDate(LocalDateTime.now());
         freelancer.addTaskToTaken(task);
         //todo добавить логику нотификации
         taskRepo.save(task);
@@ -111,8 +113,9 @@ public class TaskService {
     @Transactional
     public void submit(Task task){
         Objects.requireNonNull(task);
+        if (task.getSolution()==null) throw new ValidationException("Solution in task identified by " + task.getId() + " wat not attached");
         task.setStatus(TaskStatus.SUBMITTED);
-        task.setSubmittedDate(LocalDate.now());
+        task.setSubmittedDate(LocalDateTime.now());
         //todo добавить логику нотификации
         taskRepo.save(task);
     }
@@ -120,14 +123,14 @@ public class TaskService {
     @Transactional
     public void refuse(Task task){
         Objects.requireNonNull(task);
-        if (task.getAssignedDate().equals(LocalDate.now())){
+        if (Duration.between(task.getAssignedDate(), LocalDateTime.now()).toHours() < 24){
             task.setStatus(TaskStatus.UNASSIGNED);
             task.getFreelancer().removeTakenTask(task);
+            userRepo.save(task.getFreelancer());
             task.setFreelancer(null);
             task.setAssignedDate(null);
             //todo добавить логику нотификации
             taskRepo.save(task);
-            userRepo.save(task.getFreelancer());
         } else {
             throw new ValidationException("Freelancer can not refuse from task after 24h from assignment");
         }
