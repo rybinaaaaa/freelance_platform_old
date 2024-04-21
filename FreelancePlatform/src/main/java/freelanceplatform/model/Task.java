@@ -59,6 +59,7 @@ public class Task extends AbstractEntity {
         this.payment = payment;
     }
 
+
     @Override
     public String toString() {
         return "Task{" +
