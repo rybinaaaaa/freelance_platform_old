@@ -47,9 +47,8 @@ public class Task extends AbstractEntity {
     @Column
     private String revisions;
 
-    public Task(User customer, User freelancer, String title, String problem, Date deadline, Double payment) {
+    public Task(User customer, String title, String problem, Date deadline, Double payment) {
         this.customer = customer;
-        this.freelancer = freelancer;
         this.title = title;
         this.problem = problem;
         this.deadline = deadline;

@@ -49,7 +49,7 @@ public class UserService {
     public void save(User user){
         Objects.requireNonNull(user);
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new ValidationException("This user already exists");
+            throw new ValidationException("User with this username is already exist");
         }
         user.encodePassword(passwordEncoder);
         userRepository.save(user);
@@ -61,6 +61,8 @@ public class UserService {
         if (exists(user.getId())) {
             user.encodePassword(passwordEncoder);
             userRepository.save(user);
+        } else {
+            throw new NotFoundException("User with id " + user.getId() + " not found");
         }
     }
 
@@ -69,6 +71,8 @@ public class UserService {
         Objects.requireNonNull(user);
         if (exists(user.getId())) {
             userRepository.delete(user);
+        } else {
+            throw new NotFoundException("User with id " + user.getId() + " not found");
         }
     }
 

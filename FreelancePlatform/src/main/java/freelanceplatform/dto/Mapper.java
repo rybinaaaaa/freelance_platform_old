@@ -41,7 +41,6 @@ public class Mapper {
     public Task postedTaskDTOToTask(PostedTaskCreationDTO taskDTO){
         return new Task(
                 taskDTO.getCustomer(),
-                taskDTO.getFreelancer(),
                 taskDTO.getTitle(),
                 taskDTO.getProblem(),
                 taskDTO.getDeadline(),
