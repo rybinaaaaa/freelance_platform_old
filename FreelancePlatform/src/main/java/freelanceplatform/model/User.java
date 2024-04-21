@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -74,7 +75,24 @@ public class User extends AbstractEntity{
         this.takenTasks.add(task);
     }
 
-    public void removePostedTask(Task task){this.postedTasks.remove(task);}
+    public void removePostedTask(Task task){if (this.postedTasks!=null) this.postedTasks.remove(task);}
 
-    public void removeTakenTask(Task task){this.takenTasks.remove(task);}
+    public void removeTakenTask(Task task){if (this.takenTasks!=null) this.takenTasks.remove(task);}
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", rating=" + rating +
+                ", role=" + role +
+                ", resume=" + resume +
+                ", postedTasks=" + (postedTasks != null ? postedTasks.stream().map(Task::getTitle).collect(Collectors.joining(", ")) : null) +
+                ", proposals=" + proposals +
+                ", takenTasks=" + (takenTasks != null ? takenTasks.stream().map(Task::getTitle).collect(Collectors.joining(", ")) : null) +
+                '}';
+    }
 }

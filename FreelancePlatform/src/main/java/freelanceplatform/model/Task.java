@@ -1,9 +1,7 @@
 package freelanceplatform.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,5 +57,22 @@ public class Task extends AbstractEntity {
         this.deadline = deadline;
         this.status = TaskStatus.UNASSIGNED;
         this.payment = payment;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "customer=" + customer.getUsername() +
+                ", freelancer=" + freelancer.getUsername() +
+                ", title='" + title + '\'' +
+                ", problem='" + problem + '\'' +
+                ", deadline=" + deadline +
+                ", status=" + status +
+                ", payment=" + payment +
+                ", assignedDate=" + assignedDate +
+                ", submittedDate=" + submittedDate +
+                ", revisions='" + revisions + '\'' +
+                '}';
     }
 }
