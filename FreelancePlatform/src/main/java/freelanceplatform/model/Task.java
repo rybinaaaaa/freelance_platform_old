@@ -48,6 +48,10 @@ public class Task extends AbstractEntity {
     @Column
     private String revisions;
 
+    @Lob
+    @Column
+    private byte[] solution;
+
     public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment) {
         this.customer = customer;
         this.title = title;
