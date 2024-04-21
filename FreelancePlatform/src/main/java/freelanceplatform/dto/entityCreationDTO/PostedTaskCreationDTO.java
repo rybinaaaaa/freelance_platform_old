@@ -5,6 +5,7 @@ import freelanceplatform.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -15,7 +16,7 @@ public class PostedTaskCreationDTO {
     private User freelancer;
     private String title;
     private String problem;
-    private Date deadline;
+    private LocalDateTime deadline;
     private TaskStatus status;
     private Double payment;
 }

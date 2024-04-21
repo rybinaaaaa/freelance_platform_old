@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -14,6 +15,6 @@ public class PostedTaskDTO {
     private final String customerName;
     private final String title;
     private final String problem;
-    private final Date deadline;
+    private final LocalDateTime deadline;
     private final Double payment;
 }

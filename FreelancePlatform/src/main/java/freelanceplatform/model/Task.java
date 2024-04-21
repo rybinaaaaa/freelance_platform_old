@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
@@ -29,7 +30,7 @@ public class Task extends AbstractEntity {
     private String problem;
 
     @Column(nullable = false)
-    private Date deadline;
+    private LocalDateTime deadline;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -39,15 +40,15 @@ public class Task extends AbstractEntity {
     private Double payment;
 
     @Column
-    private LocalDate assignedDate;
+    private LocalDateTime assignedDate;
 
     @Column
-    private LocalDate submittedDate;
+    private LocalDateTime submittedDate;
 
     @Column
     private String revisions;
 
-    public Task(User customer, String title, String problem, Date deadline, Double payment) {
+    public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment) {
         this.customer = customer;
         this.title = title;
         this.problem = problem;
