@@ -1,7 +1,6 @@
 package freelanceplatform.dto.entityDTO;
 
-
-import freelanceplatform.model.Freelancer;
+import freelanceplatform.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,6 +9,6 @@ import lombok.Data;
 public class NotificationToCustomerDTO implements NotificationDTO{
 
     private final String taskTitle;
-    private final Freelancer taskPerformer;
+    private final User taskPerformer;
 
 }

@@ -11,20 +11,19 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-public class Feedback extends AbstractEntity{
+public class Feedback extends AbstractEntity {
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User from;
+    @JoinColumn(name = "from_user_id", nullable = false)
+    private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User to;
+    @JoinColumn(name = "to_user_id", nullable = false)
+    private User receiver;
 
     @Column(nullable = false)
     private Integer rating;
 
     @Column
     private String comment;
-
 }

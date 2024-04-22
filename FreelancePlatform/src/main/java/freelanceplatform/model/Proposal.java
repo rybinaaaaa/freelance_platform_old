@@ -17,7 +17,7 @@ public class Proposal extends AbstractEntity{
 
     @ManyToOne
     @JoinColumn(name = "freelancer_id", nullable = false)
-    private Freelancer freelancer;
+    private User freelancer;
 
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)

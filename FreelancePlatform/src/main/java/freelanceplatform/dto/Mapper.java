@@ -13,11 +13,12 @@ import freelanceplatform.model.User;
 public class Mapper {
 
     public UserDTO userToDTO(User user){
-        return new UserDTO(user.getFirstName(), user.getLastName(), user.getEmail(), user.getRating());
+        return new UserDTO(user.getUsername(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRating());
     }
 
     public User userDTOToUser(UserCreationDTO userDTO){
-        return new User(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(), userDTO.getPassword());
+        return new User(userDTO.getUsername(), userDTO.getFirstName(),
+                userDTO.getLastName(), userDTO.getEmail(), userDTO.getPassword());
     }
 
     public ProposalDTO proposalToDTO(Proposal proposal){
