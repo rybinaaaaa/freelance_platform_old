@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -49,6 +50,9 @@ public class Task extends AbstractEntity {
     @Lob
     @Column
     private byte[] solution;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    private List<Correction> corrections;
 
     public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment) {
         this.customer = customer;
