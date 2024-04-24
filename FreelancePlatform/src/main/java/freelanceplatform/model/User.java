@@ -43,7 +43,7 @@ public class User extends AbstractEntity{
     @JoinColumn(name = "resume_id")
     private Resume resume;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<Task> postedTasks;
 
     @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
