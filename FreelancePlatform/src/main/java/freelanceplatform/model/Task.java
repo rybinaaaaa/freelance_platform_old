@@ -35,6 +35,10 @@ public class Task extends AbstractEntity {
     @Column(nullable = false)
     private TaskStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TaskType type;
+
     @Column(nullable = false)
     private Double payment;
 
@@ -44,8 +48,8 @@ public class Task extends AbstractEntity {
     @Column
     private LocalDateTime submittedDate;
 
-    @Column
-    private String revisions;
+//    @Column
+//    private String revisions;
 
     @Lob
     @Column
@@ -54,13 +58,14 @@ public class Task extends AbstractEntity {
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     private List<Correction> corrections;
 
-    public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment) {
+    public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment, TaskType type) {
         this.customer = customer;
         this.title = title;
         this.problem = problem;
         this.deadline = deadline;
         this.status = TaskStatus.UNASSIGNED;
         this.payment = payment;
+        this.type = type;
     }
 
 
@@ -76,7 +81,6 @@ public class Task extends AbstractEntity {
                 ", payment=" + payment +
                 ", assignedDate=" + assignedDate +
                 ", submittedDate=" + submittedDate +
-                ", revisions='" + revisions + '\'' +
                 '}';
     }
 }

@@ -1,9 +1,11 @@
 package freelanceplatform.model;
 
-import org.apache.kafka.common.protocol.types.Field;
+
 
 public enum Role {
-    ADMIN("ROLE_ADMIN"), FREELANCER("ROLE_FREELANCER"), CUSTOMER("ROLE_CUSTOMER"), GUEST("ROLE_GUEST");
+//    ADMIN("ROLE_ADMIN"), FREELANCER("ROLE_FREELANCER"), CUSTOMER("ROLE_CUSTOMER"), GUEST("ROLE_GUEST");
+
+    ADMIN("ROLE_ADMIN"), USER("ROLE_USER"), GUEST("ROLE_GUEST");
 
     private final String name;
 

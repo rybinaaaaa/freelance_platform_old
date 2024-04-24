@@ -42,11 +42,11 @@ public class TaskServiceTest {
     public void setUp(){
         task = Generator.generateTask();
         customer = Generator.generateUser();
-        customer.setRole(Role.CUSTOMER);
+        customer.setRole(Role.USER);
         customer.addTaskToPosted(task);
         task.setCustomer(customer);
         freelancer = Generator.generateUser();
-        freelancer.setRole(Role.FREELANCER);
+        freelancer.setRole(Role.USER);
         task.setFreelancer(freelancer);
         userRepo.save(customer);
         userRepo.save(freelancer);
@@ -111,23 +111,23 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void refuseRemovesTaskFromFreelancersTakenTasks(){
+    public void removeFreelancerRemovesTaskFromFreelancersTakenTasks(){
         task.setFreelancer(freelancer);
         task.setAssignedDate(LocalDateTime.now());
         freelancer.addTaskToTaken(task);
         taskRepo.save(task);
         userRepo.save(freelancer);
-        taskService.refuse(task);
+        taskService.removeFreelancer(task);
         assertFalse(freelancer.getTakenTasks().contains(task));
     }
 
-    @Test
-    public void refuseThrowsValidationExceptionIf24HoursPassed(){
-        task.setFreelancer(freelancer);
-        task.setAssignedDate(LocalDateTime.now().minusHours(25));
-        freelancer.addTaskToTaken(task);
-        taskRepo.save(task);
-        userRepo.save(freelancer);
-        assertThrows(ValidationException.class, () -> taskService.refuse(task));
-    }
+//    @Test
+//    public void refuseThrowsValidationExceptionIf24HoursPassed(){
+//        task.setFreelancer(freelancer);
+//        task.setAssignedDate(LocalDateTime.now().minusHours(25));
+//        freelancer.addTaskToTaken(task);
+//        taskRepo.save(task);
+//        userRepo.save(freelancer);
+//        assertThrows(ValidationException.class, () -> taskService.removeFreelancerFromTask(task));
+//    }
 }

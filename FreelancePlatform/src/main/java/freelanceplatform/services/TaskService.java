@@ -7,13 +7,12 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.model.Task;
 import freelanceplatform.model.TaskStatus;
+import freelanceplatform.model.TaskType;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,6 +43,11 @@ public class TaskService {
         Optional<Task> task = taskRepo.findById(id);
         if (task.isEmpty()) throw new NotFoundException("Task identified by " + id + " not found.");
         return task.get();
+    }
+
+    @Transactional(readOnly = true)
+    public Iterable<Task> getAllUnassignedByType(TaskType type){
+        return taskRepo.findAllByTypeAndStatus(type, TaskStatus.UNASSIGNED);
     }
 
     @Transactional(readOnly = true)
@@ -121,22 +125,6 @@ public class TaskService {
     }
 
     @Transactional
-    public void refuse(Task task){
-        Objects.requireNonNull(task);
-        if (Duration.between(task.getAssignedDate(), LocalDateTime.now()).toHours() < 24){
-            task.setStatus(TaskStatus.UNASSIGNED);
-            task.getFreelancer().removeTakenTask(task);
-            userRepo.save(task.getFreelancer());
-            task.setFreelancer(null);
-            task.setAssignedDate(null);
-            //todo добавить логику нотификации
-            taskRepo.save(task);
-        } else {
-            throw new ValidationException("Freelancer can not refuse from task after 24h from assignment");
-        }
-    }
-
-    @Transactional
     public void accept(Task task){
         Objects.requireNonNull(task);
         task.setStatus(TaskStatus.ACCEPTED);
@@ -144,13 +132,28 @@ public class TaskService {
         taskRepo.save(task);
     }
 
+    //todo должно быть реализовано в CorrectionService
+//    @Transactional
+//    public void returnWithCorrections(Task task, String revisions){
+//        Objects.requireNonNull(task);
+//        Objects.requireNonNull(revisions);
+//        task.setStatus(TaskStatus.ASSIGNED);
+////        task.setRevisions(revisions);
+//        taskRepo.save(task);
+//    }
+
+    //todo мейби добавить ограничения
     @Transactional
-    public void returnWithRevisions(Task task, String revisions){
+    public void removeFreelancer(Task task){
         Objects.requireNonNull(task);
-        Objects.requireNonNull(revisions);
-        task.setStatus(TaskStatus.ASSIGNED);
-        task.setRevisions(revisions);
+        task.getFreelancer().removeTakenTask(task);
+        userRepo.save(task.getFreelancer());
+        task.setStatus(TaskStatus.UNASSIGNED);
+        task.setFreelancer(null);
+        task.setAssignedDate(null);
+        task.setSubmittedDate(null);
         //todo добавить логику нотификации
         taskRepo.save(task);
     }
+
 }

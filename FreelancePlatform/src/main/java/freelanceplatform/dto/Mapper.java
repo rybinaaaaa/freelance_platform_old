@@ -35,7 +35,8 @@ public class Mapper {
                 task.getTitle(),
                 task.getProblem(),
                 task.getDeadline(),
-                task.getPayment());
+                task.getPayment(),
+                task.getType());
     }
 
     public Task postedTaskDTOToTask(PostedTaskCreationDTO taskDTO){
@@ -44,7 +45,8 @@ public class Mapper {
                 taskDTO.getTitle(),
                 taskDTO.getProblem(),
                 taskDTO.getDeadline(),
-                taskDTO.getPayment());
+                taskDTO.getPayment(),
+                taskDTO.getType());
     }
 
     public NotificationDTO notificationToNotificationDTO(Notification notification){

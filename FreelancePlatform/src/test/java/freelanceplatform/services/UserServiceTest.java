@@ -30,7 +30,7 @@ public class UserServiceTest {
     @BeforeEach
     public void setUp(){
         user = Generator.generateUser();
-        user.setRole(Role.FREELANCER);
+        user.setRole(Role.USER);
     }
 
     @Test

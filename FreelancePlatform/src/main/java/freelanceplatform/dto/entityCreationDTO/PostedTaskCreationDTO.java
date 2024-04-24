@@ -1,6 +1,7 @@
 package freelanceplatform.dto.entityCreationDTO;
 
 import freelanceplatform.model.TaskStatus;
+import freelanceplatform.model.TaskType;
 import freelanceplatform.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,4 +19,5 @@ public class PostedTaskCreationDTO {
     private String problem;
     private LocalDateTime deadline;
     private Double payment;
+    private TaskType type;
 }

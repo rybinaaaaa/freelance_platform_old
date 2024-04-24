@@ -1,9 +1,6 @@
 package freelanceplatform.environment;
 
-import freelanceplatform.model.Role;
-import freelanceplatform.model.Task;
-import freelanceplatform.model.TaskStatus;
-import freelanceplatform.model.User;
+import freelanceplatform.model.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,6 +43,7 @@ public class Generator {
         task.setProblem("problem" + randomInt());
         task.setDeadline(LocalDateTime.now().plusMonths(1));
         task.setPayment(randomDouble());
+        task.setType(TaskType.DigitalMarketing);
         return task;
     }
 }
