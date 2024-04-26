@@ -105,11 +105,6 @@ public class TaskServiceTest {
         assertTrue(freelancer.getTakenTasks().contains(task));
     }
 
-//    @Test
-//    public void submitThrowsValidationExceptionIfSolutionWasNotAttached(){
-//        assertThrows(ValidationException.class, () -> taskService.submit(task));
-//    }
-
     @Test
     public void removeFreelancerRemovesTaskFromFreelancersTakenTasks(){
         task.setFreelancer(freelancer);
@@ -121,13 +116,4 @@ public class TaskServiceTest {
         assertFalse(freelancer.getTakenTasks().contains(task));
     }
 
-//    @Test
-//    public void refuseThrowsValidationExceptionIf24HoursPassed(){
-//        task.setFreelancer(freelancer);
-//        task.setAssignedDate(LocalDateTime.now().minusHours(25));
-//        freelancer.addTaskToTaken(task);
-//        taskRepo.save(task);
-//        userRepo.save(freelancer);
-//        assertThrows(ValidationException.class, () -> taskService.removeFreelancerFromTask(task));
-//    }
 }
