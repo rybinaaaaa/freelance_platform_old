@@ -48,9 +48,8 @@ public class Task extends AbstractEntity {
     @Column
     private LocalDateTime submittedDate;
 
-    //todo решить будет двунапрправленная связь или одно
-//    @OneToMany(mappedBy = "task")
-//    private List<Solution> solution;
+    @OneToMany(mappedBy = "task")
+    private List<Solution> solution;
 
     public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment, TaskType type) {
         this.customer = customer;
