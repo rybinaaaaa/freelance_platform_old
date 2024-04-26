@@ -46,7 +46,7 @@ public class User extends AbstractEntity{
     @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
     private List<Proposal> proposals;
 
-    @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "freelancer")
     private List<Task> takenTasks;
 
     public User(String username, String firstName, String lastName, String email, String password, Role role) {

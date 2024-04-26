@@ -7,6 +7,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.Data;
 import org.apache.kafka.common.protocol.types.Field;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 public class Correction extends AbstractEntity{
@@ -17,5 +19,8 @@ public class Correction extends AbstractEntity{
 
     @Column(nullable = false)
     private String content;
+
+    @Column(nullable = false)
+    private LocalDateTime date;
 
 }
