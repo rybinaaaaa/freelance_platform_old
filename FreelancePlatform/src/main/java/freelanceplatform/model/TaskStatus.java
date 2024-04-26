@@ -5,6 +5,5 @@ public enum TaskStatus {
     ASSIGNED,
     UNASSIGNED,
     SUBMITTED,
-    ACCEPTED,
-    DELETED
+    ACCEPTED
 }

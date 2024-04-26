@@ -1,14 +1,12 @@
 package freelanceplatform.services;
 
 
+import freelanceplatform.data.SolutionRepository;
 import freelanceplatform.data.TaskRepository;
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
-import freelanceplatform.model.Task;
-import freelanceplatform.model.TaskStatus;
-import freelanceplatform.model.TaskType;
-import freelanceplatform.model.User;
+import freelanceplatform.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,22 +15,25 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
+
+//todo добавить логику нотификации в методы
 @Service
 public class TaskService {
 
     private final TaskRepository taskRepo;
     private final UserRepository userRepo;
+    private final SolutionRepository solutionRepo;
 
     @Autowired
-    public TaskService(TaskRepository taskRepo, UserRepository userRepo) {
+    public TaskService(TaskRepository taskRepo, UserRepository userRepo, SolutionRepository solutionRepo) {
         this.taskRepo = taskRepo;
         this.userRepo = userRepo;
+        this.solutionRepo = solutionRepo;
     }
 
     @Transactional
     public void save(Task task){
         Objects.requireNonNull(task);
-        //todo добавить логику нотификации
         taskRepo.save(task);
     }
 
@@ -91,55 +92,40 @@ public class TaskService {
         if (exists(task.getId())) {
             task.getCustomer().removePostedTask(task);
             if (task.getFreelancer()!=null) task.getFreelancer().removeTakenTask(task);
-            task.setStatus(TaskStatus.DELETED);
             userRepo.save(task.getCustomer());
             userRepo.save(task.getFreelancer());
-            taskRepo.save(task);
+            taskRepo.delete(task);
         } else {
             throw new NotFoundException("Task to delete identified by " + task.getId() + " not found.");
         }
     }
 
     @Transactional
-    public void assign(Task task, User freelancer){
+    public void assignFreelancer(Task task, User freelancer){
         Objects.requireNonNull(task);
         Objects.requireNonNull(freelancer);
         task.setStatus(TaskStatus.ASSIGNED);
         task.setFreelancer(freelancer);
         task.setAssignedDate(LocalDateTime.now());
         freelancer.addTaskToTaken(task);
-        //todo добавить логику нотификации
         taskRepo.save(task);
         userRepo.save(freelancer);
     }
-
-    //todo переместить логику в SolutionService
-//    @Transactional
-//    public void submit(Task task){
-//        Objects.requireNonNull(task);
-//        if (task.getSolution()==null) throw new ValidationException("Solution in task identified by " + task.getId() + " wat not attached");
-//        task.setStatus(TaskStatus.SUBMITTED);
-//        task.setSubmittedDate(LocalDateTime.now());
-//        //todo добавить логику нотификации
-//        taskRepo.save(task);
-//    }
 
     @Transactional
     public void accept(Task task){
         Objects.requireNonNull(task);
         task.setStatus(TaskStatus.ACCEPTED);
-        //todo добавить логику нотификации
         taskRepo.save(task);
     }
 
     //todo должно быть реализовано в CorrectionService
-    @Transactional
-    public void returnWithCorrections(Task task){
-        Objects.requireNonNull(task);
-        task.setStatus(TaskStatus.ASSIGNED);
-        //todo добавить логику нотификации
-        taskRepo.save(task);
-    }
+//    @Transactional
+//    public void returnWithCorrections(Task task){
+//        Objects.requireNonNull(task);
+//        task.setStatus(TaskStatus.ASSIGNED);
+//        taskRepo.save(task);
+//    }
 
     //todo мейби добавить ограничения
     @Transactional
@@ -151,8 +137,18 @@ public class TaskService {
         task.setFreelancer(null);
         task.setAssignedDate(null);
         task.setSubmittedDate(null);
-        //todo добавить логику нотификации
         taskRepo.save(task);
     }
 
+    @Transactional
+    public void sendOnReview(Task task, Solution solution){
+        Objects.requireNonNull(task);
+        Objects.requireNonNull(solution);
+        solution.setTask(task);
+        task.setSolution(solution);
+        task.setStatus(TaskStatus.SUBMITTED);
+        task.setSubmittedDate(LocalDateTime.now());
+        taskRepo.save(task);
+        solutionRepo.save(solution);
+    }
 }

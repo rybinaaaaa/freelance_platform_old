@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -48,8 +49,9 @@ public class Task extends AbstractEntity {
     @Column
     private LocalDateTime submittedDate;
 
-    @OneToMany(mappedBy = "task")
-    private List<Solution> solution;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "solution_id")
+    private Solution solution;
 
     public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment, TaskType type) {
         this.customer = customer;
@@ -60,7 +62,6 @@ public class Task extends AbstractEntity {
         this.payment = payment;
         this.type = type;
     }
-
 
     @Override
     public String toString() {

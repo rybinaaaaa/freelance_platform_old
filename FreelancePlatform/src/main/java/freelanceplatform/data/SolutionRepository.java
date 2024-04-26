@@ -8,5 +8,4 @@ import java.util.Optional;
 @Repository
 public interface SolutionRepository extends CrudRepository<Solution, Integer> {
 
-    Optional<Solution> getByVersion(String version);
 }

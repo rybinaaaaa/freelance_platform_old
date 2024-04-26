@@ -1,11 +1,13 @@
 package freelanceplatform.services;
 
 import freelanceplatform.data.SolutionRepository;
+import freelanceplatform.data.TaskRepository;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Solution;
 import freelanceplatform.model.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -14,17 +16,21 @@ import java.util.Optional;
 public class SolutionService {
 
     private final SolutionRepository solutionRepo;
+    private final TaskRepository taskRepo;
 
     @Autowired
-    public SolutionService(SolutionRepository solutionRepo) {
+    public SolutionService(SolutionRepository solutionRepo, TaskRepository taskRepo) {
         this.solutionRepo = solutionRepo;
+        this.taskRepo = taskRepo;
     }
 
+    @Transactional
     public void save(Solution solution){
         Objects.requireNonNull(solution);
         solutionRepo.save(solution);
     }
 
+    @Transactional(readOnly = true)
     public Solution get(Integer id){
         Objects.requireNonNull(id);
         Optional<Solution> solution = solutionRepo.findById(id);
@@ -32,13 +38,7 @@ public class SolutionService {
         return solution.get();
     }
 
-    public Solution getByVersion(String version){
-        Objects.requireNonNull(version);
-        Optional<Solution> solution = solutionRepo.getByVersion(version);
-        if (solution.isEmpty()) throw new NotFoundException("Solution of version " + version + " not found.");
-        return solution.get();
-    }
-
+    @Transactional(readOnly = true)
     public Iterable<Solution> getAllByTask(Task task){
         Objects.requireNonNull(task);
         return null;
@@ -49,13 +49,25 @@ public class SolutionService {
         return solutionRepo.existsById(id);
     }
 
+    @Transactional
     public void update(Solution solution){
         Objects.requireNonNull(solution);
-
+        if (exists(solution.getId())){
+            solutionRepo.save(solution);
+        } else {
+            throw new NotFoundException("Solution to update identified by " + solution.getId() + " not found.");
+        }
     }
 
+    @Transactional
     public void delete(Solution solution){
         Objects.requireNonNull(solution);
-
+        if (exists(solution.getId())){
+            solution.getTask().setSolution(null);
+            taskRepo.save(solution.getTask());
+            solutionRepo.delete(solution);
+        } else {
+            throw new NotFoundException("Solution to update identified by " + solution.getId() + " not found.");
+        }
     }
 }
