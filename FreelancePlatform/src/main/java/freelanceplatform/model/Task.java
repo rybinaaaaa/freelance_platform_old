@@ -48,9 +48,9 @@ public class Task extends AbstractEntity {
     @Column
     private LocalDateTime submittedDate;
 
-    @Lob
-    @Column
-    private byte[] solution;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "solution_id")
+    private Solution solution;
 
     public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment, TaskType type) {
         this.customer = customer;
