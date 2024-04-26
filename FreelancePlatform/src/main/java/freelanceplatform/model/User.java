@@ -39,10 +39,6 @@ public class User extends AbstractEntity{
     @Column(name = "role",nullable = false)
     private Role role;
 
-    @OneToOne
-    @JoinColumn(name = "resume_id")
-    private Resume resume;
-
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<Task> postedTasks;
 
@@ -89,7 +85,6 @@ public class User extends AbstractEntity{
                 ", password='" + password + '\'' +
                 ", rating=" + rating +
                 ", role=" + role +
-                ", resume=" + resume +
                 ", postedTasks=" + (postedTasks != null ? postedTasks.stream().map(Task::getTitle).collect(Collectors.joining(", ")) : null) +
                 ", proposals=" + proposals +
                 ", takenTasks=" + (takenTasks != null ? takenTasks.stream().map(Task::getTitle).collect(Collectors.joining(", ")) : null) +

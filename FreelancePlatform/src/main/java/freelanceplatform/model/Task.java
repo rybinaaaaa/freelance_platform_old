@@ -48,15 +48,9 @@ public class Task extends AbstractEntity {
     @Column
     private LocalDateTime submittedDate;
 
-//    @Column
-//    private String revisions;
-
     @Lob
     @Column
     private byte[] solution;
-
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    private List<Correction> corrections;
 
     public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment, TaskType type) {
         this.customer = customer;

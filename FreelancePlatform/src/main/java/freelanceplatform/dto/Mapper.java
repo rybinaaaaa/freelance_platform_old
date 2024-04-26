@@ -4,7 +4,6 @@ import freelanceplatform.dto.entityCreationDTO.PostedTaskCreationDTO;
 import freelanceplatform.dto.entityCreationDTO.ProposalCreationDTO;
 import freelanceplatform.dto.entityCreationDTO.UserCreationDTO;
 import freelanceplatform.dto.entityDTO.*;
-import freelanceplatform.model.Notification;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Task;
 import freelanceplatform.model.User;
@@ -47,17 +46,5 @@ public class Mapper {
                 taskDTO.getDeadline(),
                 taskDTO.getPayment(),
                 taskDTO.getType());
-    }
-
-    public NotificationDTO notificationToNotificationDTO(Notification notification){
-        return switch (notification.getType()) {
-            case TaskWasCompleted -> new NotificationToCustomerDTO(
-                    notification.getTask().getTitle(),
-                    notification.getTask().getFreelancer());
-            case TaskWasPosted -> new NotificationToFreelancersDTO(
-                    notification.getTask().getTitle(),
-                    notification.getTask().getCustomer(),
-                    notification.getText());
-        };
     }
 }
