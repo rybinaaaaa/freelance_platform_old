@@ -1,5 +1,6 @@
 package freelanceplatform.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -74,6 +75,11 @@ public class User extends AbstractEntity{
     public void removePostedTask(Task task){if (this.postedTasks!=null) this.postedTasks.remove(task);}
 
     public void removeTakenTask(Task task){if (this.takenTasks!=null) this.takenTasks.remove(task);}
+
+    @JsonIgnore
+    public boolean isAdmin() {
+        return role == Role.ADMIN;
+    }
 
     @Override
     public String toString() {
