@@ -133,14 +133,13 @@ public class TaskService {
     }
 
     //todo должно быть реализовано в CorrectionService
-//    @Transactional
-//    public void returnWithCorrections(Task task, String revisions){
-//        Objects.requireNonNull(task);
-//        Objects.requireNonNull(revisions);
-//        task.setStatus(TaskStatus.ASSIGNED);
-////        task.setRevisions(revisions);
-//        taskRepo.save(task);
-//    }
+    @Transactional
+    public void returnWithCorrections(Task task){
+        Objects.requireNonNull(task);
+        task.setStatus(TaskStatus.ASSIGNED);
+        //todo добавить логику нотификации
+        taskRepo.save(task);
+    }
 
     //todo мейби добавить ограничения
     @Transactional

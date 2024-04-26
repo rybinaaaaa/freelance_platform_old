@@ -3,6 +3,7 @@ package freelanceplatform.services;
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
+import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -76,11 +77,17 @@ public class UserService {
         }
     }
 
-
-
     public boolean exists(Integer id){
         Objects.requireNonNull(id);
         return userRepository.existsById(id);
+    }
+
+    @Transactional
+    public void saveResume(String filename, byte[] content, User user) {
+        Resume resume = new Resume();
+        resume.setFilename(filename);
+        resume.setContent(content);
+        resume.setUser(user);
     }
 
 }
