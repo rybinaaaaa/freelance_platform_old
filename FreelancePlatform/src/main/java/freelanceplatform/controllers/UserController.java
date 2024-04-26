@@ -6,7 +6,10 @@ import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
 import freelanceplatform.security.model.UserDetails;
 import freelanceplatform.services.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,9 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@Slf4j
 @RestController
 @RequestMapping("/rest/users")
 @PreAuthorize("permitAll()")
+@CacheConfig(cacheNames = "students")
 public class UserController {
 
     private final UserService userService;
@@ -31,8 +36,10 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Cacheable(key = "#id")
     public User getUserById(@PathVariable Integer id) {
         try {
+            log.info("fetching with db");
             return userService.find(id);
         } catch (NotFoundException e) {
             throw NotFoundException.create("User", id);
