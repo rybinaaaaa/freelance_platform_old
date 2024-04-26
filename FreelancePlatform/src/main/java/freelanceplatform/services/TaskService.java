@@ -32,7 +32,6 @@ public class TaskService {
     @Transactional
     public void save(Task task){
         Objects.requireNonNull(task);
-        task.setStatus(TaskStatus.UNASSIGNED);
         //todo добавить логику нотификации
         taskRepo.save(task);
     }
@@ -114,15 +113,16 @@ public class TaskService {
         userRepo.save(freelancer);
     }
 
-    @Transactional
-    public void submit(Task task){
-        Objects.requireNonNull(task);
-        if (task.getSolution()==null) throw new ValidationException("Solution in task identified by " + task.getId() + " wat not attached");
-        task.setStatus(TaskStatus.SUBMITTED);
-        task.setSubmittedDate(LocalDateTime.now());
-        //todo добавить логику нотификации
-        taskRepo.save(task);
-    }
+    //todo переместить логику в SolutionService
+//    @Transactional
+//    public void submit(Task task){
+//        Objects.requireNonNull(task);
+//        if (task.getSolution()==null) throw new ValidationException("Solution in task identified by " + task.getId() + " wat not attached");
+//        task.setStatus(TaskStatus.SUBMITTED);
+//        task.setSubmittedDate(LocalDateTime.now());
+//        //todo добавить логику нотификации
+//        taskRepo.save(task);
+//    }
 
     @Transactional
     public void accept(Task task){
