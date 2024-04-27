@@ -1,5 +1,6 @@
 package freelanceplatform.dto.entityDTO;
 
+import freelanceplatform.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,5 +13,5 @@ public class UserDTO {
     private final String lastName;
     private final String email;
     private final int rating;
-
+    private final Role role;
 }
