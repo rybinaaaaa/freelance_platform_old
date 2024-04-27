@@ -37,13 +37,16 @@ public class Generator {
 
     public static Task generateTask(){
         final Task task = new Task();
-//        task.setId(randomInt());
         task.setStatus(TaskStatus.UNASSIGNED);
         task.setTitle("title" + randomInt());
         task.setProblem("problem" + randomInt());
         task.setDeadline(LocalDateTime.now().plusMonths(1));
         task.setPayment(randomDouble());
         task.setType(TaskType.DigitalMarketing);
+        User customer = Generator.generateUser();
+        customer.setRole(Role.USER);
+        customer.addTaskToPosted(task);
+        task.setCustomer(customer);
         return task;
     }
 
@@ -56,5 +59,17 @@ public class Generator {
         resume.setFilename("resume");
         resume.setContent(content);
         return resume;
+    }
+
+    public static Solution generateSolution(){
+        final Solution solution = new Solution();
+        solution.setTask(generateTask());
+        solution.setDescription("description" + randomInt());
+        byte[] content = new byte[1024];
+        for (int i = 0; i < content.length; i++) {
+            content[i] = (byte) randomInt();
+        }
+        solution.setContent(content);
+        return solution;
     }
 }
