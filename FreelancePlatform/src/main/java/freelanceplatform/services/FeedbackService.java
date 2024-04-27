@@ -27,8 +27,22 @@ public class FeedbackService {
         return feedbackRepository.findAll();
     }
 
+//    @Transactional
     public void deleteFeedbackById(Long id) {
         feedbackRepository.deleteById(id);
+//        feedbackRepository.findById(id)
+//                .ifPresent(feedback -> {
+//                    User sender = feedback.getSender();
+//                    User receiver = feedback.getReceiver();
+//
+//                    sender.deleteSentFeedback(feedback);
+//                    receiver.deleteReceivedFeedback(feedback);
+//
+//                    feedback.setSender(null);
+//                    feedback.setReceiver(null);
+//
+//                    feedbackRepository.delete(feedback);
+//                });
     }
 
     public List<Feedback> getFeedbacksByReceiver(User receiver) {
