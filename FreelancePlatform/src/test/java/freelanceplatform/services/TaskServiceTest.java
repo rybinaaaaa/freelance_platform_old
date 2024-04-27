@@ -34,21 +34,15 @@ public class TaskServiceTest {
 
     private Task task;
 
-    private User customer;
-
     private User freelancer;
 
     @BeforeEach
     public void setUp(){
         task = Generator.generateTask();
-        customer = Generator.generateUser();
-        customer.setRole(Role.USER);
-        customer.addTaskToPosted(task);
-        task.setCustomer(customer);
         freelancer = Generator.generateUser();
         freelancer.setRole(Role.USER);
         task.setFreelancer(freelancer);
-        userRepo.save(customer);
+        userRepo.save(task.getCustomer());
         userRepo.save(freelancer);
         taskRepo.save(task);
     }
@@ -87,9 +81,9 @@ public class TaskServiceTest {
     @Test
     public void deleteRemovesTaskFromCustomersPostedTasks(){
         task.setStatus(TaskStatus.ASSIGNED);
-        assertTrue(customer.getPostedTasks().contains(task));
+        assertTrue(task.getCustomer().getPostedTasks().contains(task));
         taskService.delete(task);
-        assertFalse(customer.getPostedTasks().contains(task));
+        assertFalse(task.getCustomer().getPostedTasks().contains(task));
     }
 
     @Test
