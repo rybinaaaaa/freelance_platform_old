@@ -45,31 +45,65 @@ public class TaskService {
         return task.get();
     }
 
+
+    //TASK BOARD
     @Transactional(readOnly = true)
-    public Iterable<Task> getAllUnassignedByType(TaskType type){
-        return taskRepo.findAllByTypeAndStatus(type, TaskStatus.UNASSIGNED);
+    public Iterable<Task> getAllTaskBoardByPostedDate(boolean fromNewest){
+        if (fromNewest) {
+            return taskRepo.findAllByStatusFromNewest(TaskStatus.UNASSIGNED);
+        } else {
+            return taskRepo.findAllByStatusFromOldest(TaskStatus.UNASSIGNED);
+        }
     }
 
     @Transactional(readOnly = true)
-    public Iterable<Task> getAllUnassigned(){
-        return taskRepo.findAllByStatus(TaskStatus.UNASSIGNED);
+    public Iterable<Task> getAllTaskBoardByTypeAndPostedDate(TaskType type, boolean fromNewest) {
+        if (fromNewest) {
+            return taskRepo.findAllByTypeAndStatusFromNewest(type, TaskStatus.UNASSIGNED);
+        } else {
+            return taskRepo.findAllByTypeAndStatusFromOldest(type, TaskStatus.UNASSIGNED);
+        }
+    }
+
+    //TAKEN TASKS
+    @Transactional(readOnly = true)
+    public Iterable<Task> getAllTakenByUserIdAndDeadlineStatus(Integer userId, boolean expired){
+        if (expired){
+            return taskRepo.findAllTakenByFreelancerIdDeadlineExpired(userId);
+        } else {
+            return taskRepo.findAllTakenByFreelancerIdDeadlineNotExpired(userId);
+        }
     }
 
     @Transactional(readOnly = true)
-    public Iterable<Task> getAllAssigned(){
-        return taskRepo.findAllByStatus(TaskStatus.ASSIGNED);
+    public Iterable<Task> getAllTakenByUserIdAndStatusAndDeadlineStatus(Integer userId, TaskStatus taskStatus, boolean expired){
+        if (expired){
+            return taskRepo.findAllTakenByFreelancerIdAndStatusDeadlineExpired(userId, taskStatus);
+        } else {
+            return taskRepo.findAllTakenByFreelancerIdAndStatusDeadlineNotExpired(userId, taskStatus);
+        }
+    }
+
+    //POSTED TASKS
+    @Transactional(readOnly = true)
+    public Iterable<Task> getAllPostedByUserIdAndExpiredStatus(Integer userId, boolean expired){
+        if (expired){
+            return taskRepo.findAllPostedByCustomerIdDeadlineExpired(userId);
+        } else {
+            return taskRepo.findAllPostedByCustomerIdDeadlineNotExpired(userId);
+        }
     }
 
     @Transactional(readOnly = true)
-    public Iterable<Task> getAllSubmitted(){
-        return taskRepo.findAllByStatus(TaskStatus.SUBMITTED);
+    public Iterable<Task> getAllPostedByUserIdAndStatusAndExpiredStatus(Integer userId, TaskStatus taskStatus , boolean expired){
+        if (expired){
+            return taskRepo.findAllPostedByCustomerIdAndStatusDeadlineExpired(userId, taskStatus);
+        } else {
+            return taskRepo.findAllPostedByCustomerIdAndStatusDeadlineNotExpired(userId, taskStatus);
+        }
     }
 
-    @Transactional(readOnly = true)
-    public Iterable<Task> getAllAccepted(){
-        return taskRepo.findAllByStatus(TaskStatus.ACCEPTED);
-    }
-
+    //OTHER
     public boolean exists(Integer id){
         Objects.requireNonNull(id);
         return taskRepo.existsById(id);

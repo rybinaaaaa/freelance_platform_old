@@ -2,8 +2,8 @@ package freelanceplatform.model;
 
 public enum TaskStatus {
 
-    ASSIGNED,
     UNASSIGNED,
+    ASSIGNED,
     SUBMITTED,
     ACCEPTED
 }

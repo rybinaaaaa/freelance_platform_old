@@ -49,6 +49,9 @@ public class Task extends AbstractEntity {
     @Column
     private LocalDateTime submittedDate;
 
+    @Column
+    private LocalDateTime postedDate;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "solution_id")
     private Solution solution;
@@ -61,6 +64,7 @@ public class Task extends AbstractEntity {
         this.status = TaskStatus.UNASSIGNED;
         this.payment = payment;
         this.type = type;
+        this.postedDate = LocalDateTime.now();
     }
 
     @Override
@@ -75,6 +79,7 @@ public class Task extends AbstractEntity {
                 ", payment=" + payment +
                 ", assignedDate=" + assignedDate +
                 ", submittedDate=" + submittedDate +
+                ", postedDate=" + postedDate +
                 '}';
     }
 }
