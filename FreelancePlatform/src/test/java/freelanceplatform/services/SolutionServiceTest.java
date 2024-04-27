@@ -53,7 +53,7 @@ public class SolutionServiceTest {
 
     @Test
     public void getThrowsNotFoundExceptionIfIdIsWrong(){
-        assertThrows(NotFoundException.class, () -> solutionService.get(-1));
+        assertThrows(NotFoundException.class, () -> solutionService.getById(-1));
     }
 
     @Test

@@ -48,5 +48,4 @@ public interface TaskRepository extends CrudRepository<Task, Integer> {
 
     @Query(value = "select t from Task t where t.customer.id = :customerId and t.status = :taskStatus and t.deadline > CURRENT_TIMESTAMP")
     Iterable<Task> findAllPostedByCustomerIdAndStatusDeadlineExpired(Integer customerId, TaskStatus taskStatus);
-
 }

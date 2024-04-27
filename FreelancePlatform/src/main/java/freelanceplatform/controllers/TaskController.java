@@ -1,16 +1,29 @@
 package freelanceplatform.controllers;
 
 
+import freelanceplatform.dto.Mapper;
+import freelanceplatform.dto.entityCreationDTO.TaskCreationDTO;
+import freelanceplatform.dto.entityDTO.TaskDTO;
+import freelanceplatform.exceptions.NotFoundException;
+import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.model.*;
 import freelanceplatform.security.model.UserDetails;
+import freelanceplatform.services.SolutionService;
 import freelanceplatform.services.TaskService;
 import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Slf4j
 @RestController
@@ -19,65 +32,145 @@ import org.springframework.web.bind.annotation.*;
 public class TaskController {
 
     private final TaskService taskService;
+    private final SolutionService solutionService;
+    private final Mapper mapper;
 
     @Autowired
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, SolutionService solutionService, Mapper mapper) {
         this.taskService = taskService;
+        this.solutionService = solutionService;
+        this.mapper = mapper;
     }
 
-    public void create(){
-
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> create(@RequestBody TaskCreationDTO taskDTO){
+        final Task task = mapper.taskDTOToTask(taskDTO);
+        taskService.save(task);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(task.getId())
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Task getById(@PathVariable Integer id){
-        return null;
+    public ResponseEntity<TaskDTO> getById(@PathVariable Integer id){
+        try {
+            final TaskDTO taskDTO = mapper.taskToTaskDTO(taskService.getById(id));
+            return ResponseEntity.ok(taskDTO);
+        } catch (NotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     //TASK BOARD
-    public Iterable<Task> getAllTaskBoard(boolean fromNewest, @Nullable TaskType type){
+    @GetMapping(value = "/taskBoard", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Iterable<TaskDTO>> getAllTaskBoard(boolean fromNewest, @Nullable TaskType type){
+        final Iterable<Task> tasks;
+        final List<TaskDTO> taskDTOs = new ArrayList<>();
         if (type == null) {
-            return taskService.getAllTaskBoardByPostedDate(fromNewest);
+            tasks = taskService.getAllTaskBoardByPostedDate(fromNewest);
         } else {
-            return taskService.getAllTaskBoardByTypeAndPostedDate(type, fromNewest);
+            tasks = taskService.getAllTaskBoardByTypeAndPostedDate(type, fromNewest);
         }
+        tasks.forEach(task -> taskDTOs.add(mapper.taskToTaskDTO(task)));
+        return ResponseEntity.ok(taskDTOs);
     }
 
     //TAKEN TASKS
-    public Iterable<Task> getAllTakenByTaskStatusAndExpiredStatus(@Nullable TaskStatus taskStatus, boolean expired, Authentication auth){
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping(value = "/taken", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Iterable<TaskDTO>> getAllTakenByTaskStatusAndExpiredStatus(@Nullable TaskStatus taskStatus, boolean expired, Authentication auth){
         final User user = ((UserDetails) auth.getPrincipal()).getUser();
+        final Iterable<Task> tasks;
+        final List<TaskDTO> taskDTOs = new ArrayList<>();
         if (taskStatus == null) {
-            return taskService.getAllTakenByUserIdAndDeadlineStatus(user.getId(), expired);
+            tasks = taskService.getAllTakenByUserIdAndDeadlineStatus(user.getId(), expired);
         } else {
-            return taskService.getAllTakenByUserIdAndStatusAndDeadlineStatus(user.getId(), taskStatus, expired);
+            tasks = taskService.getAllTakenByUserIdAndStatusAndDeadlineStatus(user.getId(), taskStatus, expired);
         }
+        tasks.forEach(task -> taskDTOs.add(mapper.taskToTaskDTO(task)));
+        return ResponseEntity.ok(taskDTOs);
     }
 
     //POSTED TASKS
-    public Iterable<Task> getAllPostedByTaskStatusAndExpiredStatus(@Nullable TaskStatus taskStatus, boolean expired, Authentication auth){
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping(value = "/posted", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Iterable<TaskDTO>> getAllPostedByTaskStatusAndExpiredStatus(@Nullable TaskStatus taskStatus, boolean expired, Authentication auth){
         final User user = ((UserDetails) auth.getPrincipal()).getUser();
+        final Iterable<Task> tasks;
+        final List<TaskDTO> taskDTOs = new ArrayList<>();
         if (taskStatus == null) {
-            return taskService.getAllPostedByUserIdAndExpiredStatus(user.getId(), expired);
+            tasks = taskService.getAllPostedByUserIdAndExpiredStatus(user.getId(), expired);
         } else {
-            return taskService.getAllPostedByUserIdAndStatusAndExpiredStatus(user.getId(), taskStatus, expired);
+            tasks = taskService.getAllPostedByUserIdAndStatusAndExpiredStatus(user.getId(), taskStatus, expired);
+        }
+        tasks.forEach(task -> taskDTOs.add(mapper.taskToTaskDTO(task)));
+        return ResponseEntity.ok(taskDTOs);
+    }
+
+    //todo интегрировать дто
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PutMapping(value = "/posted", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> update(@RequestBody Task updatedTask){
+        try {
+            taskService.update(updatedTask);
+            return ResponseEntity.noContent().build();
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (ValidationException e){
+            return ResponseEntity.badRequest().build();
         }
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void update(@PathVariable Integer id, @RequestParam Task updatedTask){
-
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @DeleteMapping(value = "/posted/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id){
+        final Task task = taskService.getById(id);
+        try {
+            taskService.delete(task);
+            return ResponseEntity.noContent().build();
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @DeleteMapping(value = "/{id}")
-    public void delete(Task task){}
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping(value = "/posted/{id}/proposals/{proposalId}")
+    public ResponseEntity<Void> assignFreelancer(@PathVariable Integer id, @PathVariable Integer proposalId){
+        final Task task = taskService.getById(id);
+        //todo разкоментить когда будет готов proposalService
+//        final User freelancer = proposalService.getById(proposalId);
+//        taskService.assignFreelancer(task, freelancer);
+        return ResponseEntity.noContent().build();
+    }
 
-    public void assignFreelancer(Task task, User freelancer){}
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping(value = "/posted/{id}/accept")
+    public ResponseEntity<Void> accept(@PathVariable Integer id){
+        final Task task = taskService.getById(id);
+        taskService.accept(task);
+        return ResponseEntity.noContent().build();
+    }
 
-    public void accept(Task task){}
+    //здесь путь не лежит через posted поскольку этот метод
+    // используется как для уваольнения фрилансера так и для октаза от задачи
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping(value = "/{id}/")
+    public ResponseEntity<Void> removeFreelancer(@PathVariable Integer id){
+        final Task task = taskService.getById(id);
+        taskService.removeFreelancer(task);
+        return ResponseEntity.noContent().build();
+    }
 
-    public void removeFreelancer(Task task){}
-
-    public void sendOnReview(Task task, Solution solution){}
-
-
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping(value = "/taken/{id}/{solutionId}")
+    public ResponseEntity<Void> sendOnReview(@PathVariable Integer id, @PathVariable Integer solutionId){
+        final Task task = taskService.getById(id);
+        final Solution solution = solutionService.getById(solutionId);
+        taskService.sendOnReview(task, solution);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -38,7 +38,7 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
-    public Task get(Integer id){
+    public Task getById(Integer id){
         Objects.requireNonNull(id);
         Optional<Task> task = taskRepo.findById(id);
         if (task.isEmpty()) throw new NotFoundException("Task identified by " + id + " not found.");

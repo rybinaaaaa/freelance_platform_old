@@ -1,6 +1,6 @@
 package freelanceplatform.dto;
 
-import freelanceplatform.dto.entityCreationDTO.PostedTaskCreationDTO;
+import freelanceplatform.dto.entityCreationDTO.TaskCreationDTO;
 import freelanceplatform.dto.entityCreationDTO.ProposalCreationDTO;
 import freelanceplatform.dto.entityCreationDTO.UserCreationDTO;
 import freelanceplatform.dto.entityDTO.*;
@@ -30,17 +30,18 @@ public class Mapper {
         return new Proposal(proposalDTO.getFreelancer(), proposalDTO.getTask());
     }
 
-    public PostedTaskDTO taskToPostedTaskDTO(Task task){
-        return new PostedTaskDTO(
+    public TaskDTO taskToTaskDTO(Task task){
+        return new TaskDTO(
                 task.getCustomer().getFirstName(),
+                task.getFreelancer().getFirstName(),
                 task.getTitle(),
                 task.getProblem(),
                 task.getDeadline(),
-                task.getPayment(),
-                task.getType());
+                task.getPayment().toString(),
+                task.getType().toString());
     }
 
-    public Task postedTaskDTOToTask(PostedTaskCreationDTO taskDTO){
+    public Task taskDTOToTask(TaskCreationDTO taskDTO){
         return new Task(
                 taskDTO.getCustomer(),
                 taskDTO.getTitle(),

@@ -49,7 +49,7 @@ public class TaskServiceTest {
 
     @Test
     public void getThrowsNotFoundExceptionIfIdIsWrong(){
-        assertThrows(NotFoundException.class, () -> taskService.get(-1));
+        assertThrows(NotFoundException.class, () -> taskService.getById(-1));
     }
 
     @Test

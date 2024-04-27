@@ -1,18 +1,15 @@
 package freelanceplatform.dto.entityCreationDTO;
 
-import freelanceplatform.model.TaskStatus;
 import freelanceplatform.model.TaskType;
 import freelanceplatform.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
-public class PostedTaskCreationDTO {
+public class TaskCreationDTO {
 
     private User customer;
     private String title;

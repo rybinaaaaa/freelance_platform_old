@@ -31,7 +31,7 @@ public class SolutionService {
     }
 
     @Transactional(readOnly = true)
-    public Solution get(Integer id){
+    public Solution getById(Integer id){
         Objects.requireNonNull(id);
         Optional<Solution> solution = solutionRepo.findById(id);
         if (solution.isEmpty()) throw new NotFoundException("Solution identified by " + id + " not found.");

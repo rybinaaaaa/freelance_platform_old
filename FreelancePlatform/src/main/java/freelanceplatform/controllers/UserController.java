@@ -5,14 +5,17 @@ import freelanceplatform.dto.Mapper;
 import freelanceplatform.dto.entityCreationDTO.UserCreationDTO;
 import freelanceplatform.dto.entityDTO.UserDTO;
 import freelanceplatform.exceptions.NotFoundException;
+import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.model.Resume;
+import freelanceplatform.model.Task;
+import freelanceplatform.model.TaskStatus;
 import freelanceplatform.model.User;
 import freelanceplatform.security.model.UserDetails;
+import freelanceplatform.services.TaskService;
 import freelanceplatform.services.UserService;
+import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,11 +36,13 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final TaskService taskService;
     private final Mapper mapper;
 
     @Autowired
-    public UserController(UserService userService, Mapper mapper) {
+    public UserController(UserService userService, TaskService taskService, Mapper mapper) {
         this.userService = userService;
+        this.taskService = taskService;
         this.mapper = mapper;
     }
 
