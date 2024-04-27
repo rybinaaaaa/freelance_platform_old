@@ -7,12 +7,14 @@ import freelanceplatform.dto.entityDTO.*;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Task;
 import freelanceplatform.model.User;
+import org.springframework.stereotype.Component;
 
-//will be used in controllers
+@Component
 public class Mapper {
 
     public UserDTO userToDTO(User user){
-        return new UserDTO(user.getUsername(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRating());
+        return new UserDTO(user.getUsername(), user.getFirstName(), user.getLastName(),
+                user.getEmail(), user.getRating(), user.getRole());
     }
 
     public User userDTOToUser(UserCreationDTO userDTO){

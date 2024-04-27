@@ -1,6 +1,9 @@
 package freelanceplatform.controllers;
 
 import freelanceplatform.controllers.util.RestUtils;
+import freelanceplatform.dto.Mapper;
+import freelanceplatform.dto.entityCreationDTO.UserCreationDTO;
+import freelanceplatform.dto.entityDTO.UserDTO;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
@@ -19,41 +22,61 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/rest/users")
 @PreAuthorize("permitAll()")
-@CacheConfig(cacheNames = "students")
+//@CacheConfig(cacheNames = "students")
 public class UserController {
 
     private final UserService userService;
+    private final Mapper mapper;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, Mapper mapper) {
         this.userService = userService;
+        this.mapper = mapper;
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Cacheable(key = "#id")
-    public User getUserById(@PathVariable Integer id) {
+    public UserDTO getUserById(@PathVariable Integer id) {
         try {
             log.info("fetching with db");
-            return userService.find(id);
+            return mapper.userToDTO(userService.find(id));
         } catch (NotFoundException e) {
             throw NotFoundException.create("User", id);
         }
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Iterable<User> getAllUsers() {
-        return userService.findAll();
+    @GetMapping(value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @Cacheable(key = "#username")
+    public UserDTO getUserByUsername(@PathVariable String username) {
+        try {
+            return mapper.userToDTO(userService.findByUsername(username));
+        } catch (NotFoundException e) {
+            throw NotFoundException.create("User", username);
+        }
     }
 
-    @PreAuthorize("(!#user.isAdmin() && anonymous) || hasRole('ROLE_ADMIN')")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Iterable<UserDTO> getAllUsers() {
+        Iterable<User> users = userService.findAll();
+
+        List<UserDTO> userDTOs = new ArrayList<>();
+        for (User user : users) {
+            userDTOs.add(mapper.userToDTO(user));
+        }
+
+        return userDTOs;
+    }
+
+    @PreAuthorize("(!#userCreationDTO.isAdmin() && anonymous) || hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> signUp(@RequestBody User user) {
+    public ResponseEntity<Void> signUp(@RequestBody UserCreationDTO userCreationDTO) {
+        User user = mapper.userDTOToUser(userCreationDTO);
         userService.save(user);
         final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/current");
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
@@ -61,24 +84,29 @@ public class UserController {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER', 'ROLE_GUEST')")
     @GetMapping(value = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User getCurrent(Authentication auth) {
+    public UserDTO getCurrent(Authentication auth) {
         assert auth.getPrincipal() instanceof UserDetails;
-        return ((UserDetails) auth.getPrincipal()).getUser();
+        return mapper.userToDTO(((UserDetails) auth.getPrincipal()).getUser());
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping("/update")
-    public ResponseEntity<Void> updateUser(@RequestBody User userToUpdate, Authentication auth) {
-        final User user = ((UserDetails) auth.getPrincipal()).getUser();
-        if (!user.getId().equals(userToUpdate.getId())) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<Void> updateUser(@RequestBody UserDTO userDTOToUpdate, Authentication auth) {
+        try {
+            final User user = ((UserDetails) auth.getPrincipal()).getUser();
+            final User userToUpdate = userService.findByUsername(userDTOToUpdate.getUsername());
+            if (!user.getId().equals(userToUpdate.getId())) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            userToUpdate.setFirstName(userDTOToUpdate.getFirstName());
+            userToUpdate.setLastName(userDTOToUpdate.getLastName());
+            userToUpdate.setEmail(userDTOToUpdate.getEmail());
+            userService.update(userToUpdate);
+            final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/current");
+            return new ResponseEntity<>(headers, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            throw NotFoundException.create("User", userDTOToUpdate.getUsername());
         }
-        if (!userService.exists(userToUpdate.getId())){
-            throw NotFoundException.create("User", userToUpdate.getId());
-        }
-        userService.update(userToUpdate);
-        final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/current");
-        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

@@ -1,5 +1,6 @@
 package freelanceplatform.dto.entityCreationDTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import freelanceplatform.model.Role;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
@@ -17,4 +18,8 @@ public class UserCreationDTO {
     private final String password;
     private final Role role;
 
+    @JsonIgnore
+    public boolean isAdmin() {
+        return role == Role.ADMIN;
+    }
 }
