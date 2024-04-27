@@ -46,4 +46,15 @@ public class Generator {
         task.setType(TaskType.DigitalMarketing);
         return task;
     }
+
+    public static Resume generateResume() {
+        final Resume resume = new Resume();
+        byte[] content = new byte[1024];
+        for (int i = 0; i < content.length; i++) {
+            content[i] = (byte) randomInt();
+        }
+        resume.setFilename("resume");
+        resume.setContent(content);
+        return resume;
+    }
 }

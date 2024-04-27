@@ -1,9 +1,6 @@
 package freelanceplatform.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -17,7 +14,8 @@ public class Resume extends AbstractEntity{
     @Column(nullable = false)
     private byte[] content;
 
-    @OneToOne(mappedBy = "resume")
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
 
 }

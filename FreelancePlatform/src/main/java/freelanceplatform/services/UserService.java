@@ -1,5 +1,6 @@
 package freelanceplatform.services;
 
+import freelanceplatform.data.ResumeRepository;
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
@@ -16,12 +17,14 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final ResumeRepository resumeRepository;
 
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, ResumeRepository resumeRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.resumeRepository = resumeRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -84,10 +87,19 @@ public class UserService {
 
     @Transactional
     public void saveResume(String filename, byte[] content, User user) {
+        if (content.length == 0 || filename.equals("")) throw new ValidationException("Bad inputs");
         Resume resume = new Resume();
         resume.setFilename(filename);
         resume.setContent(content);
         resume.setUser(user);
+        resumeRepository.save(resume);
+    }
+
+    @Transactional
+    public Resume getUsersResume(User user) {
+        Optional<Resume> resume = resumeRepository.findByUserId(user.getId());
+        if (resume.isEmpty()) throw new NotFoundException("Resume for user with id " + user.getId() + " not found");
+        return resume.get();
     }
 
 }
