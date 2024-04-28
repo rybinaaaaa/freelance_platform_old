@@ -10,7 +10,6 @@ import freelanceplatform.model.*;
 import freelanceplatform.security.model.UserDetails;
 import freelanceplatform.services.SolutionService;
 import freelanceplatform.services.TaskService;
-import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -44,14 +43,12 @@ public class TaskController {
 
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> create(@RequestBody TaskCreationDTO taskDTO){
+    public ResponseEntity<Void> save(@RequestBody TaskCreationDTO taskDTO){
         final Task task = mapper.taskDTOToTask(taskDTO);
         taskService.save(task);
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(task.getId())
-                .toUri();
+                .fromCurrentRequest().path("/{id}")
+                .buildAndExpand(task.getId()).toUri();
         return ResponseEntity.created(location).build();
     }
 
@@ -67,7 +64,8 @@ public class TaskController {
 
     //TASK BOARD
     @GetMapping(value = "/taskBoard", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Iterable<TaskDTO>> getAllTaskBoard(boolean fromNewest, @Nullable TaskType type){
+    public ResponseEntity<Iterable<TaskDTO>> getAllTaskBoard(@RequestParam boolean fromNewest,
+                                                             @RequestParam(required = false) TaskType type){
         final Iterable<Task> tasks;
         final List<TaskDTO> taskDTOs = new ArrayList<>();
         if (type == null) {
@@ -82,7 +80,8 @@ public class TaskController {
     //TAKEN TASKS
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping(value = "/taken", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Iterable<TaskDTO>> getAllTakenByTaskStatusAndExpiredStatus(@Nullable TaskStatus taskStatus, boolean expired, Authentication auth){
+    public ResponseEntity<Iterable<TaskDTO>> getAllTakenByTaskStatusAndExpiredStatus(@RequestParam(required = false) TaskStatus taskStatus,
+                                                                                     @RequestParam boolean expired, Authentication auth){
         final User user = ((UserDetails) auth.getPrincipal()).getUser();
         final Iterable<Task> tasks;
         final List<TaskDTO> taskDTOs = new ArrayList<>();
@@ -98,7 +97,7 @@ public class TaskController {
     //POSTED TASKS
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping(value = "/posted", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Iterable<TaskDTO>> getAllPostedByTaskStatusAndExpiredStatus(@Nullable TaskStatus taskStatus, boolean expired, Authentication auth){
+    public ResponseEntity<Iterable<TaskDTO>> getAllPostedByTaskStatusAndExpiredStatus(@RequestParam(required = false) TaskStatus taskStatus, @RequestParam boolean expired, Authentication auth){
         final User user = ((UserDetails) auth.getPrincipal()).getUser();
         final Iterable<Task> tasks;
         final List<TaskDTO> taskDTOs = new ArrayList<>();
@@ -112,9 +111,9 @@ public class TaskController {
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping(value = "/posted", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> update(@RequestBody TaskDTO updatedTaskDTO){
-        final Task task = taskService.getById(updatedTaskDTO.getId());
+    @PutMapping(value = "/posted/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody TaskDTO updatedTaskDTO){
+        final Task task = taskService.getById(id);
         task.setTitle(updatedTaskDTO.getTitle());
         task.setProblem(updatedTaskDTO.getProblem());
         task.setDeadline(updatedTaskDTO.getDeadline());
@@ -170,11 +169,17 @@ public class TaskController {
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PostMapping(value = "/taken/{id}/{solutionId}")
-    public ResponseEntity<Void> sendOnReview(@PathVariable Integer id, @PathVariable Integer solutionId){
+    @PostMapping(value = "/taken/{id}/attach-solution")
+    public ResponseEntity<Void> attachSolution(@PathVariable Integer id, @RequestBody Solution solution){
         final Task task = taskService.getById(id);
-        final Solution solution = solutionService.getById(solutionId);
-        taskService.sendOnReview(task, solution);
+        taskService.attachSolution(task, solution);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping(value = "/taken/{id}")
+    public ResponseEntity<Void> sendOnReview(@PathVariable Integer id){
+        taskService.senOnReview(taskService.getById(id));
         return ResponseEntity.noContent().build();
     }
 }

@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class Solution extends AbstractEntity{
 
     @OneToOne(mappedBy = "solution")
+    @Column(nullable = false)
     private Task task;
 
     @Column(nullable = false)
