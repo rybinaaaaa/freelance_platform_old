@@ -111,12 +111,16 @@ public class TaskController {
         return ResponseEntity.ok(taskDTOs);
     }
 
-    //todo интегрировать дто
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping(value = "/posted", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> update(@RequestBody Task updatedTask){
+    public ResponseEntity<Void> update(@RequestBody TaskDTO updatedTaskDTO){
+        final Task task = taskService.getById(updatedTaskDTO.getId());
+        task.setTitle(updatedTaskDTO.getTitle());
+        task.setProblem(updatedTaskDTO.getProblem());
+        task.setDeadline(updatedTaskDTO.getDeadline());
+        task.setType(updatedTaskDTO.getType());
         try {
-            taskService.update(updatedTask);
+            taskService.update(task);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();

@@ -31,23 +31,31 @@ public class Mapper {
     }
 
     public TaskDTO taskToTaskDTO(Task task){
-        return new TaskDTO(
-                task.getCustomer().getFirstName(),
-                task.getFreelancer().getFirstName(),
-                task.getTitle(),
-                task.getProblem(),
-                task.getDeadline(),
-                task.getPayment().toString(),
-                task.getType().toString());
+        TaskDTO taskDTO =  new TaskDTO();
+        taskDTO.setId(task.getId());
+        taskDTO.setCustomerName(task.getCustomer().getFirstName());
+        if (task.getFreelancer() != null) {
+            taskDTO.setFreelancerName(task.getFreelancer().getFirstName());
+        }
+        taskDTO.setTitle(task.getTitle());
+        taskDTO.setProblem(task.getProblem());
+        taskDTO.setDeadline(task.getDeadline());
+        taskDTO.setStatus(task.getStatus());
+        taskDTO.setType(task.getType());
+        taskDTO.setPayment(task.getPayment());
+        return taskDTO;
     }
 
     public Task taskDTOToTask(TaskCreationDTO taskDTO){
-        return new Task(
+        Task task = new Task(
                 taskDTO.getCustomer(),
                 taskDTO.getTitle(),
                 taskDTO.getProblem(),
                 taskDTO.getDeadline(),
                 taskDTO.getPayment(),
                 taskDTO.getType());
+        task.setId(taskDTO.getId());
+        task.setStatus(taskDTO.getTaskStatus());
+        return task;
     }
 }

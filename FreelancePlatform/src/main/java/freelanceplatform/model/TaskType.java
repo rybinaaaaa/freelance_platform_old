@@ -13,5 +13,6 @@ public enum TaskType {
     GamingAndVrArDevelopment,
     TutoringAndEducation,
     SalesAndMarketing,
-    DigitalMarketing
+    DigitalMarketing;
+
 }
