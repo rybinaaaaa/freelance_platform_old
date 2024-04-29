@@ -18,8 +18,16 @@ public class Mapper {
     }
 
     public User userDTOToUser(UserCreationDTO userDTO){
-        return new User(userDTO.getUsername(), userDTO.getFirstName(),
-                userDTO.getLastName(), userDTO.getEmail(), userDTO.getPassword(), userDTO.getRole());
+        return User.builder()
+                .username(userDTO.getUsername())
+                .firstName(userDTO.getFirstName())
+                .lastName(userDTO.getLastName())
+                .email(userDTO.getEmail())
+                .password(userDTO.getPassword())
+                .role(userDTO.getRole())
+                .build();
+//        return new User(userDTO.getUsername(), userDTO.getFirstName(),
+//                userDTO.getLastName(), userDTO.getEmail(), userDTO.getPassword(), userDTO.getRole());
     }
 
     public ProposalDTO proposalToDTO(Proposal proposal){

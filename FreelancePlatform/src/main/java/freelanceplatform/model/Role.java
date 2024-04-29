@@ -1,7 +1,5 @@
 package freelanceplatform.model;
 
-
-
 public enum Role {
     ADMIN("ROLE_ADMIN"), USER("ROLE_USER"), GUEST("ROLE_GUEST");
 

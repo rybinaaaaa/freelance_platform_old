@@ -12,7 +12,8 @@ import lombok.Data;
 @MappedSuperclass
 @Data
 public class AbstractEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 }

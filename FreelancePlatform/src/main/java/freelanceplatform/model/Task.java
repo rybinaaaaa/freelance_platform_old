@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 public class Task extends AbstractEntity {
 
     @ManyToOne

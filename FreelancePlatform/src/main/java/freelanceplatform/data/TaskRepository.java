@@ -28,7 +28,7 @@ public interface TaskRepository extends CrudRepository<Task, Integer> {
     Iterable<Task> findAllTakenByFreelancerIdDeadlineNotExpired(Integer freelancerId);
 
     @Query(value = "select t from Task t where t.freelancer.id = :freelancerId and t.deadline < CURRENT_TIMESTAMP")
-    Iterable<Task> findAllTakenByFreelancerIdDeadlineExpired(Integer freelancerIdId);
+    Iterable<Task> findAllTakenByFreelancerIdDeadlineExpired(Integer freelancerId);
 
     @Query(value = "select t from Task t where t.freelancer.id = :freelancerId and t.status = :taskStatus and t.deadline > CURRENT_TIMESTAMP")
     Iterable<Task> findAllTakenByFreelancerIdAndStatusDeadlineNotExpired(Integer freelancerId, TaskStatus taskStatus);

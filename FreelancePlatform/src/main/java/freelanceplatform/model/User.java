@@ -2,21 +2,23 @@ package freelanceplatform.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"receivedFeedbacks", "sentFeedbacks", "proposals", "takenTasks"})
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
-public class User extends AbstractEntity{
+@AllArgsConstructor
+@Builder
+public class User extends AbstractEntity {
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -37,7 +39,7 @@ public class User extends AbstractEntity{
     private int rating;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role",nullable = false)
+    @Column(name = "role", nullable = false)
     private Role role;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
@@ -46,54 +48,64 @@ public class User extends AbstractEntity{
     @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
     private List<Proposal> proposals;
 
-    @OneToMany(mappedBy = "freelancer")
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
+    private List<Feedback> receivedFeedbacks;
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    private List<Feedback> sentFeedbacks;
+
+    @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
     private List<Task> takenTasks;
 
-    public User(String username, String firstName, String lastName, String email, String password, Role role) {
-        this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.role = role;
+    public void addProposal(Proposal... proposals) {
+        this.proposals.addAll(Arrays.asList(proposals));
+    }
+
+    public void addReceivedFeedback(Feedback... feedbacks) {
+        this.receivedFeedbacks.addAll(Arrays.asList(feedbacks));
+    }
+
+    public void addSentFeedback(Feedback... feedbacks) {
+        this.sentFeedbacks.addAll(Arrays.asList(feedbacks));
+    }
+
+    public void deleteProposal(Proposal proposal) {
+        this.proposals.remove(proposal);
+    }
+
+
+    public void deleteReceivedFeedback(Feedback feedback) {
+        this.receivedFeedbacks.remove(feedback);
+    }
+
+    public void deleteSentFeedback(Feedback feedback) {
+        this.sentFeedbacks.remove(feedback);
     }
 
     public void encodePassword(PasswordEncoder encoder) {
         this.password = encoder.encode(password);
     }
 
-    public void addTaskToPosted(Task task){
-        if (postedTasks==null) postedTasks = new ArrayList<>();
+    public void addTaskToPosted(Task task) {
+        if (postedTasks == null) postedTasks = new ArrayList<>();
         this.postedTasks.add(task);
     }
 
-    public void addTaskToTaken(Task task){
-        if (takenTasks==null) takenTasks = new ArrayList<>();
+    public void addTaskToTaken(Task task) {
+        if (takenTasks == null) takenTasks = new ArrayList<>();
         this.takenTasks.add(task);
     }
 
-    public void removePostedTask(Task task){if (this.postedTasks!=null) this.postedTasks.remove(task);}
+    public void removePostedTask(Task task) {
+        if (this.postedTasks != null) this.postedTasks.remove(task);
+    }
 
-    public void removeTakenTask(Task task){if (this.takenTasks!=null) this.takenTasks.remove(task);}
+    public void removeTakenTask(Task task) {
+        if (this.takenTasks != null) this.takenTasks.remove(task);
+    }
 
     @JsonIgnore
     public boolean isAdmin() {
         return role == Role.ADMIN;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", rating=" + rating +
-                ", role=" + role +
-                ", postedTasks=" + (postedTasks != null ? postedTasks.stream().map(Task::getTitle).collect(Collectors.joining(", ")) : null) +
-                ", proposals=" + proposals +
-                ", takenTasks=" + (takenTasks != null ? takenTasks.stream().map(Task::getTitle).collect(Collectors.joining(", ")) : null) +
-                '}';
     }
 }
