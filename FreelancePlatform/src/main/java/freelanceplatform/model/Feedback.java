@@ -7,8 +7,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = true)
+//@ToString(exclude = {"sender", "receiver"})
 @Data
 @Entity
 public class Feedback extends AbstractEntity {

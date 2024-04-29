@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"receivedFeedbacks", "sentFeedbacks", "proposals", "takenTasks"})
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
@@ -62,29 +64,29 @@ public class User extends AbstractEntity{
         this.email = email;
     }
 
-//    public void addProposal(Proposal ...proposals) {
-//        this.proposals.addAll(Arrays.asList(proposals));
-//    };
-//
-//    public void addReceivedFeedback(Feedback ...feedbacks) {
-//        this.receivedFeedbacks.addAll(Arrays.asList(feedbacks));
-//    };
-//
-//    public void addSentFeedback(Feedback ...feedbacks) {
-//        this.sentFeedbacks.addAll(Arrays.asList(feedbacks));
-//    };
-//
-//    public void deleteProposal(Proposal proposal) {
-//        this.proposals.remove(proposal);
-//    };
-//
-//    public void deleteReceivedFeedback(Feedback feedback) {
-//        this.receivedFeedbacks.remove(feedback);
-//    };
-//
-//    public void deleteSentFeedback(Feedback feedback) {
-//        this.sentFeedbacks.remove(feedback);
-//    };
+    public void addProposal(Proposal ...proposals) {
+        this.proposals.addAll(Arrays.asList(proposals));
+    };
+
+    public void addReceivedFeedback(Feedback ...feedbacks) {
+        this.receivedFeedbacks.addAll(Arrays.asList(feedbacks));
+    };
+
+    public void addSentFeedback(Feedback ...feedbacks) {
+        this.sentFeedbacks.addAll(Arrays.asList(feedbacks));
+    };
+
+    public void deleteProposal(Proposal proposal) {
+        this.proposals.remove(proposal);
+    };
+
+    public void deleteReceivedFeedback(Feedback feedback) {
+        this.receivedFeedbacks.remove(feedback);
+    };
+
+    public void deleteSentFeedback(Feedback feedback) {
+        this.sentFeedbacks.remove(feedback);
+    };
 
     public void encodePassword(PasswordEncoder encoder) {
         this.password = encoder.encode(password);

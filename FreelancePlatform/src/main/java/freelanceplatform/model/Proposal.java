@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Proposal extends AbstractEntity{
+public class Proposal extends AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = "freelancer_id", nullable = false)

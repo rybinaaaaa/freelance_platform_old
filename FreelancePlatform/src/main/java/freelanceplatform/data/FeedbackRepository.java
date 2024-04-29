@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-//@Repository
+@Repository
 public interface FeedbackRepository extends CrudRepository<Feedback, Long> {
 
     List<Feedback> findAll();
