@@ -1,7 +1,8 @@
 package freelanceplatform.controllers;
 
 import freelanceplatform.dto.Mapper;
-import freelanceplatform.dto.entityDTO.FeedbackReadDTO;
+import freelanceplatform.dto.entityDTO.FeedbackDTO;
+import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Feedback;
 import freelanceplatform.services.FeedbackService;
 import lombok.RequiredArgsConstructor;
@@ -24,21 +25,21 @@ public class FeedbackController {
     private final Mapper mapper;
 
     @GetMapping("/{id}")
-    public ResponseEntity<FeedbackReadDTO> findById(@PathVariable Integer id) {
-        return feedbackService.findById(id).map(fb -> ResponseEntity.ok(mapper.feedbackToFeedbackReadDTO(fb))).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<FeedbackDTO> findById(@PathVariable Integer id) {
+        return feedbackService.findById(id).map(fb -> ResponseEntity.ok(mapper.feedbackToFeedbackDto(fb))).orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping()
-    public ResponseEntity<List<FeedbackReadDTO>> findAll() {
-        return ResponseEntity.ok(feedbackService.findAll().stream().map(mapper::feedbackToFeedbackReadDTO).toList());
+    public ResponseEntity<List<FeedbackDTO>> findAll() {
+        return ResponseEntity.ok(feedbackService.findAll().stream().map(mapper::feedbackToFeedbackDto).toList());
     }
 
     @PreAuthorize("hasRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PutMapping("/{id}")
-    public ResponseEntity<Object> update(@PathVariable Integer id, @RequestBody FeedbackReadDTO feedbackReadDTO) {
-        Feedback newFb = mapper.feedbackReadDTOToFeedback(feedbackReadDTO);
-        return feedbackService.findById(id).map(fb -> {
-            feedbackService.save(new Feedback(
+    public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody FeedbackDTO feedbackDTO) {
+        Feedback newFb = mapper.feedbackDtoToFeedback(feedbackDTO);
+        try {
+            feedbackService.update(new Feedback(
                     id,
                     newFb.getSender(),
                     newFb.getReceiver(),
@@ -46,13 +47,15 @@ public class FeedbackController {
                     newFb.getComment()
             ));
             return ResponseEntity.ok().build();
-        }).orElse(ResponseEntity.notFound().build());
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PreAuthorize("hasRole({'ROLE_GUEST', 'ROLE_ADMIN'})")
     @PostMapping()
-    public ResponseEntity<Object> save(@RequestBody FeedbackReadDTO feedbackReadDTO) {
-        Feedback newFb = mapper.feedbackReadDTOToFeedback(feedbackReadDTO);
+    public ResponseEntity<Object> save(@RequestBody FeedbackDTO feedbackDTO) {
+        Feedback newFb = mapper.feedbackDtoToFeedback(feedbackDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
                 .buildAndExpand(feedbackService.save(newFb).getId()).toUri();

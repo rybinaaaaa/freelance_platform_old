@@ -2,6 +2,7 @@ package freelanceplatform.services;
 
 import freelanceplatform.data.FeedbackRepository;
 import freelanceplatform.data.UserRepository;
+import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Feedback;
 import freelanceplatform.model.User;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,19 @@ public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
     private final UserRepository userRepository;
+
+    @Transactional
+    public Feedback update(Feedback newFb) {
+        return feedbackRepository.findById(newFb.getId()).map(fb -> {
+            fb.getReceiver().deleteReceivedFeedback(fb);
+            fb.getSender().deleteSentFeedback(fb);
+
+            Optional.ofNullable(newFb.getReceiver()).ifPresent(receiver -> receiver.addReceivedFeedback(newFb));
+            Optional.ofNullable(newFb.getSender()).ifPresent(sender -> sender.addSentFeedback(newFb));
+
+            return feedbackRepository.save(fb);
+        }).orElseThrow(() -> new NotFoundException("Feedback with id " + newFb.getId() + " not found."));
+    }
 
     @Transactional
     public Feedback save(Feedback feedback) {

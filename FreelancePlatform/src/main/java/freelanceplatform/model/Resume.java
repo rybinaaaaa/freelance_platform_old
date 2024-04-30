@@ -23,5 +23,4 @@ public class Resume extends AbstractEntity{
     @OneToOne
     @JoinColumn(name = "user_id", unique = true)
     private User user;
-
 }

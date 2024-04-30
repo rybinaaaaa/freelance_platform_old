@@ -3,6 +3,7 @@ package freelanceplatform.services;
 import freelanceplatform.data.ProposalRepository;
 import freelanceplatform.data.TaskRepository;
 import freelanceplatform.data.UserRepository;
+import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.User;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,15 @@ public class ProposalService {
     private final TaskRepository taskRepository;
 
     @Transactional
+    public Proposal update(Proposal proposal) {
+        return proposalRepository.findById(proposal.getId()).map(pr -> {
+            Optional.ofNullable(pr.getFreelancer()).ifPresent(fr -> fr.deleteProposal(pr));
+            Optional.ofNullable(proposal.getFreelancer()).ifPresent(fr -> fr.addProposal(pr));
+            return proposalRepository.save(proposal);
+        }).orElseThrow(() -> new NotFoundException("User with id " + proposal.getId() + " not found"));
+    }
+
+    @Transactional
     public Proposal save(Proposal proposal) {
         Optional.ofNullable(proposal.getFreelancer()).ifPresent(
                 maybeFreelancer -> {
@@ -31,7 +41,7 @@ public class ProposalService {
                 maybeTask -> {
                     Optional.ofNullable(maybeTask.getId())
                             .flatMap(taskRepository::findById)
-                            .orElseThrow(RuntimeException::new);
+                            .orElseThrow(() -> new NotFoundException("User with id " + proposal.getId() + " not found"));
                 }
         );
         return proposalRepository.save(proposal);
@@ -53,8 +63,12 @@ public class ProposalService {
     }
 
     @Transactional
-    public void deleteById(Integer id) {
-        proposalRepository.deleteById(id);
+    public boolean deleteById(Integer id) {
+        proposalRepository.findById(id).map(proposal -> {
+            proposalRepository.delete(proposal);
+            return true;
+        });
+        return false;
     }
 
     @Transactional(readOnly = true)
