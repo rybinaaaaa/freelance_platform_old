@@ -34,19 +34,19 @@ public class FeedbackService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Feedback> findById(Long id) {
+    public Optional<Feedback> findById(Integer id) {
         return feedbackRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
-    public List<Feedback> getAll() {
+    public List<Feedback> findAll() {
         return feedbackRepository.findAll();
     }
 
     @Transactional
-    public void deleteById(Long id) {
-        feedbackRepository.findById(id)
-                .ifPresent(feedback -> {
+    public boolean deleteById(Integer id) {
+        return feedbackRepository.findById(id)
+                .map(feedback -> {
                     User sender = feedback.getSender();
                     User receiver = feedback.getReceiver();
 
@@ -57,7 +57,8 @@ public class FeedbackService {
                     feedback.setReceiver(null);
 
                     feedbackRepository.delete(feedback);
-                });
+                    return true;
+                }).orElse(false);
     }
 
     @Transactional(readOnly = true)

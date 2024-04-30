@@ -8,6 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserDTO {
 
+    private final Integer id;
     private final String username;
     private final String firstName;
     private final String lastName;

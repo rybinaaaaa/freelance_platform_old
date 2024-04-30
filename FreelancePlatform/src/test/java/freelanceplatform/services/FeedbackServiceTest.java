@@ -23,14 +23,14 @@ class FeedbackServiceTest extends IntegrationTestBase {
 
     @Test
     void findByIdTest() {
-        Optional<Feedback> feedbackById = feedbackService.findById(1L);
+        Optional<Feedback> feedbackById = feedbackService.findById(1);
         assertTrue(feedbackById.isPresent());
         Assertions.assertThat(feedbackById.get().getSender().getEmail()).isEqualTo("user5@example.com");
     }
 
     @Test
     void deleteByIdTest() {
-        feedbackService.deleteById(1L);
-        assertFalse(feedbackService.findById(1L).isPresent());
+        feedbackService.deleteById(1);
+        assertFalse(feedbackService.findById(1).isPresent());
     }
 }

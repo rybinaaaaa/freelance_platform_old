@@ -7,10 +7,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Data
 public class Resume extends AbstractEntity{
 
     @Column(nullable = false)

@@ -10,13 +10,13 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(exclude = {"receivedFeedbacks", "sentFeedbacks", "proposals", "takenTasks"})
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Builder
 public class User extends AbstractEntity {
 

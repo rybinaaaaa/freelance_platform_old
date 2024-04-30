@@ -4,7 +4,6 @@ import freelanceplatform.data.ProposalRepository;
 import freelanceplatform.data.TaskRepository;
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.model.Proposal;
-import freelanceplatform.model.Task;
 import freelanceplatform.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

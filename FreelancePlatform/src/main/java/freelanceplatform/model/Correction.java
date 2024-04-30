@@ -13,8 +13,8 @@ import org.apache.kafka.common.protocol.types.Field;
 import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
 @Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Correction extends AbstractEntity{

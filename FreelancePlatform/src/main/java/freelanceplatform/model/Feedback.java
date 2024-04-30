@@ -6,10 +6,10 @@ import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class Feedback extends AbstractEntity {
 
     @ManyToOne
@@ -25,4 +25,12 @@ public class Feedback extends AbstractEntity {
 
     @Column
     private String comment;
+
+    public Feedback(Integer id, User sender, User receiver, Integer rating, String comment) {
+        setId(id);
+        this.sender = sender;
+        this.receiver = receiver;
+        this.rating = rating;
+        this.comment = comment;
+    }
 }

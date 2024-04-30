@@ -4,20 +4,34 @@ import freelanceplatform.dto.entityCreationDTO.TaskCreationDTO;
 import freelanceplatform.dto.entityCreationDTO.ProposalCreationDTO;
 import freelanceplatform.dto.entityCreationDTO.UserCreationDTO;
 import freelanceplatform.dto.entityDTO.*;
+import freelanceplatform.model.Feedback;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Task;
 import freelanceplatform.model.User;
+import freelanceplatform.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
+@RequiredArgsConstructor
 public class Mapper {
 
-    public UserDTO userToDTO(User user){
-        return new UserDTO(user.getUsername(), user.getFirstName(), user.getLastName(),
-                user.getEmail(), user.getRating(), user.getRole());
+    private final UserService userService;
+
+    public UserDTO userToDTO(User user) {
+        return new UserDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getRating(),
+                user.getRole());
     }
 
-    public User userDTOToUser(UserCreationDTO userDTO){
+    public User userDTOToUser(UserCreationDTO userDTO) {
         return User.builder()
                 .username(userDTO.getUsername())
                 .firstName(userDTO.getFirstName())
@@ -30,16 +44,16 @@ public class Mapper {
 //                userDTO.getLastName(), userDTO.getEmail(), userDTO.getPassword(), userDTO.getRole());
     }
 
-    public ProposalDTO proposalToDTO(Proposal proposal){
+    public ProposalDTO proposalToDTO(Proposal proposal) {
         return new ProposalDTO(proposal.getFreelancer().getFirstName(), proposal.getTask().getTitle());
     }
 
-    public Proposal proposalDTOToProposal(ProposalCreationDTO proposalDTO){
+    public Proposal proposalDTOToProposal(ProposalCreationDTO proposalDTO) {
         return new Proposal(proposalDTO.getFreelancer(), proposalDTO.getTask());
     }
 
-    public TaskDTO taskToTaskDTO(Task task){
-        TaskDTO taskDTO =  new TaskDTO();
+    public TaskDTO taskToTaskDTO(Task task) {
+        TaskDTO taskDTO = new TaskDTO();
         taskDTO.setId(task.getId());
         taskDTO.setCustomerName(task.getCustomer().getFirstName());
         if (task.getFreelancer() != null) {
@@ -54,7 +68,7 @@ public class Mapper {
         return taskDTO;
     }
 
-    public Task taskDTOToTask(TaskCreationDTO taskDTO){
+    public Task taskDTOToTask(TaskCreationDTO taskDTO) {
         Task task = new Task(
                 taskDTO.getCustomer(),
                 taskDTO.getTitle(),
@@ -65,5 +79,37 @@ public class Mapper {
         task.setId(taskDTO.getId());
         task.setStatus(taskDTO.getTaskStatus());
         return task;
+    }
+
+    public Feedback feedbackReadDTOToFeedback(FeedbackReadDTO fb) {
+        Feedback feedback = new Feedback();
+        feedback.setId(fb.id());
+        feedback.setRating(fb.rating());
+        feedback.setComment(fb.comment());
+
+        User receiver = Optional.ofNullable(fb.receiver())
+                .map(UserDTO::getId)
+                .map(userService::find)
+                .orElse(null);
+
+        User sender = Optional.ofNullable(fb.sender())
+                .map(UserDTO::getId)
+                .map(userService::find)
+                .orElse(null);
+
+        feedback.setReceiver(receiver);
+        feedback.setSender(sender);
+
+        return feedback;
+    }
+
+    public FeedbackReadDTO feedbackToFeedbackReadDTO(Feedback fb) {
+        return new FeedbackReadDTO(
+                fb.getId(),
+                userToDTO(fb.getSender()),
+                userToDTO(fb.getReceiver()),
+                fb.getRating(),
+                fb.getComment()
+        );
     }
 }

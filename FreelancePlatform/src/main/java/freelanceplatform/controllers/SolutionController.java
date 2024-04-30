@@ -1,6 +1,5 @@
 package freelanceplatform.controllers;
 
-
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Solution;
 import freelanceplatform.services.SolutionService;

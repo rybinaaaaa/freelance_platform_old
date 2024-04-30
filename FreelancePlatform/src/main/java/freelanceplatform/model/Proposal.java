@@ -9,10 +9,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class Proposal extends AbstractEntity {
 
     @ManyToOne
