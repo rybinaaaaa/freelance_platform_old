@@ -1,23 +1,22 @@
 package freelanceplatform.dto.entityCreationDTO;
 
 import freelanceplatform.model.TaskStatus;
-import freelanceplatform.model.TaskType;
 import freelanceplatform.model.User;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
-public class TaskCreationDTO {
+public class PostedTaskCreationDTO {
 
-    private final Integer id;
     private User customer;
+    private User freelancer;
     private String title;
     private String problem;
-    private LocalDateTime deadline;
-    private TaskStatus taskStatus;
+    private Date deadline;
+    private TaskStatus status;
     private Double payment;
-    private TaskType type;
 }

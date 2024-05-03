@@ -1,13 +1,11 @@
 package freelanceplatform.dto.entityDTO;
 
+import lombok.Value;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor
+@Value
 public class ProposalDTO {
 
-    private final String freelancerName;
-    private final String taskTitle;
+    Integer id;
+    UserDTO freelancer;
+    TaskDTO task;
 }

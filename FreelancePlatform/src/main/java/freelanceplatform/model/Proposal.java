@@ -9,11 +9,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Proposal extends AbstractEntity{
+@Data
+public class Proposal extends AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = "freelancer_id", nullable = false)
@@ -22,4 +22,10 @@ public class Proposal extends AbstractEntity{
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
+
+    public Proposal(Integer id, User freelancer, Task task) {
+        setId(id);
+        this.freelancer = freelancer;
+        this.task = task;
+    }
 }

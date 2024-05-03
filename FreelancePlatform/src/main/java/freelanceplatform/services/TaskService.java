@@ -175,14 +175,19 @@ public class TaskService {
     }
 
     @Transactional
-    public void sendOnReview(Task task, Solution solution){
+    public void attachSolution(Task task, Solution solution){
         Objects.requireNonNull(task);
         Objects.requireNonNull(solution);
         solution.setTask(task);
         task.setSolution(solution);
+        taskRepo.save(task);
+        solutionRepo.save(solution);
+    }
+
+    @Transactional
+    public void senOnReview(Task task){
         task.setStatus(TaskStatus.SUBMITTED);
         task.setSubmittedDate(LocalDateTime.now());
         taskRepo.save(task);
-        solutionRepo.save(solution);
     }
 }

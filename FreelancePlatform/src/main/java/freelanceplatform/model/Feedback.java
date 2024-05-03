@@ -1,25 +1,24 @@
 package freelanceplatform.model;
-
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
 @Entity
-public class Feedback extends AbstractEntity{
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class Feedback extends AbstractEntity {
 
     @ManyToOne
-    @JoinColumn(name = "user_id_from", nullable = false)
-    private User from;
+    @JoinColumn(name = "from_user_id", nullable = false)
+    private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "user_id_to", nullable = false)
-    private User to;
+    @JoinColumn(name = "to_user_id", nullable = false)
+    private User receiver;
 
     @Column(nullable = false)
     private Integer rating;
@@ -27,4 +26,11 @@ public class Feedback extends AbstractEntity{
     @Column
     private String comment;
 
+    public Feedback(Integer id, User sender, User receiver, Integer rating, String comment) {
+        setId(id);
+        this.sender = sender;
+        this.receiver = receiver;
+        this.rating = rating;
+        this.comment = comment;
+    }
 }

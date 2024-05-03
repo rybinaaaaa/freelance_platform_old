@@ -38,10 +38,11 @@ public class SolutionService {
         return solution.get();
     }
 
-    @Transactional(readOnly = true)
-    public Iterable<Solution> getAllByTask(Task task){
+    public Solution getByTask(Task task){
         Objects.requireNonNull(task);
-        return null;
+        Optional<Solution> solution = solutionRepo.findByTask(task);
+        if (solution.isEmpty()) throw new NotFoundException("Solution identified by task" + task.getId() + " not found.");
+        return solution.get();
     }
 
     public boolean exists(Integer id){

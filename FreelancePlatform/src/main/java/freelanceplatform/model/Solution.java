@@ -7,13 +7,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class Solution extends AbstractEntity{
 
-    @OneToOne(mappedBy = "solution")
+    @OneToOne(mappedBy = "solution", optional = false)
     private Task task;
 
     @Column(nullable = false)

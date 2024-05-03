@@ -10,9 +10,10 @@ import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
 @Entity
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Task extends AbstractEntity {
 
     @ManyToOne
