@@ -5,15 +5,11 @@ import freelanceplatform.dto.Mapper;
 import freelanceplatform.dto.entityCreationDTO.UserCreationDTO;
 import freelanceplatform.dto.entityDTO.UserDTO;
 import freelanceplatform.exceptions.NotFoundException;
-import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.model.Resume;
-import freelanceplatform.model.Task;
-import freelanceplatform.model.TaskStatus;
 import freelanceplatform.model.User;
 import freelanceplatform.security.model.UserDetails;
 import freelanceplatform.services.TaskService;
 import freelanceplatform.services.UserService;
-import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -32,7 +28,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/rest/users")
 @PreAuthorize("permitAll()")
-//@CacheConfig(cacheNames = "students")
 public class UserController {
 
     private final UserService userService;
@@ -47,22 +42,23 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserDTO getUserById(@PathVariable Integer id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
         try {
             log.info("fetching with db");
-            return mapper.userToDTO(userService.find(id));
+            final UserDTO userDTO = mapper.userToDTO(userService.find(id));
+            return ResponseEntity.ok(userDTO);
         } catch (NotFoundException e) {
-            throw NotFoundException.create("User", id);
+            return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping(value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Cacheable(key = "#username")
-    public UserDTO getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
         try {
-            return mapper.userToDTO(userService.findByUsername(username));
+            final UserDTO userDTO = mapper.userToDTO(userService.findByUsername(username));
+            return ResponseEntity.ok(userDTO);
         } catch (NotFoundException e) {
-            throw NotFoundException.create("User", username);
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -110,38 +106,43 @@ public class UserController {
             final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/current");
             return new ResponseEntity<>(headers, HttpStatus.OK);
         } catch (NotFoundException e) {
-            throw NotFoundException.create("User", userDTOToUpdate.getUsername());
+            return ResponseEntity.notFound().build();
         }
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserByAdmin(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteUserByAdmin(@PathVariable Integer id) {
         final User userToDelete = userService.find(id);
         if (userToDelete != null) {
             userService.delete(userToDelete);
-        } else throw NotFoundException.create("User", id);
+            final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/");
+            return new ResponseEntity<>(headers, HttpStatus.OK);
+        } else return ResponseEntity.notFound().build();
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAccount(Authentication auth){
+    public ResponseEntity<Void> deleteAccount(Authentication auth){
         final User userToDelete = ((UserDetails) auth.getPrincipal()).getUser();
         if (userToDelete != null) {
             userService.delete(userToDelete);
-        } else throw new NotFoundException("User does not exist");
+            final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/");
+            return new ResponseEntity<>(headers, HttpStatus.OK);
+        } else return ResponseEntity.notFound().build();
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/myResume")
-    public Resume getResume(Authentication auth) {
+    public ResponseEntity<Resume> getResume(Authentication auth) {
         final User user = ((UserDetails) auth.getPrincipal()).getUser();
         try {
-            return userService.getUsersResume(user);
+            final Resume resume = userService.getUsersResume(user);
+            return ResponseEntity.ok(resume);
         } catch (NotFoundException e) {
-            throw new NotFoundException("Resume does not exist");
+            return ResponseEntity.notFound().build();
         }
     }
 
