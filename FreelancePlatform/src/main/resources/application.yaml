@@ -10,3 +10,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/mydatabase
     username: myuser
     password: secret
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer

@@ -12,6 +12,8 @@ import freelanceplatform.services.TaskService;
 import freelanceplatform.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -52,8 +54,8 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+    @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserDTO> getUserByUserName(@PathVariable String username) {
         try {
             final UserDTO userDTO = mapper.userToDTO(userService.findByUsername(username));
             return ResponseEntity.ok(userDTO);
@@ -91,18 +93,26 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PutMapping("/update")
-    public ResponseEntity<Void> updateUser(@RequestBody UserDTO userDTOToUpdate, Authentication auth) {
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateUser(@PathVariable Integer id,
+                                           @RequestBody UserDTO userDTOToUpdate, Authentication auth) {
         try {
             final User user = ((UserDetails) auth.getPrincipal()).getUser();
-            final User userToUpdate = userService.findByUsername(userDTOToUpdate.getUsername());
+
+            if (!id.equals(userDTOToUpdate.getId())) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            final User userToUpdate = userService.find(id);
             if (!user.getId().equals(userToUpdate.getId())) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
             userToUpdate.setFirstName(userDTOToUpdate.getFirstName());
             userToUpdate.setLastName(userDTOToUpdate.getLastName());
             userToUpdate.setEmail(userDTOToUpdate.getEmail());
-            userService.update(userToUpdate);
+
+            userService.update(id, userToUpdate);
+
             final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/current");
             return new ResponseEntity<>(headers, HttpStatus.OK);
         } catch (NotFoundException e) {

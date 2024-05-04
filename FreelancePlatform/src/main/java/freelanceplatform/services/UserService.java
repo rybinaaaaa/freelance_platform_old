@@ -7,6 +7,8 @@ import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,7 @@ public class UserService {
     }
 
     @Transactional
+    @Cacheable(value = "users", key = "#id")
     public User find(Integer id) {
         Objects.requireNonNull(id);
         Optional<User> userOptional = userRepository.findById(id);
@@ -60,11 +63,13 @@ public class UserService {
     }
 
     @Transactional
-    public void update(User user){
+    @CachePut(value = "users", key = "#id")
+    public User update(Integer id, User user){
         Objects.requireNonNull(user);
         if (exists(user.getId())) {
             user.encodePassword(passwordEncoder);
-            userRepository.save(user);
+            System.out.println(user.toString());
+            return userRepository.save(user);
         } else {
             throw new NotFoundException("User with id " + user.getId() + " not found");
         }
