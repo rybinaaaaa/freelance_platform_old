@@ -21,5 +21,5 @@ public class Solution extends AbstractEntity{
 
     @Lob
     @Column(nullable = false)
-    private byte[] content;
+    private String link;
 }

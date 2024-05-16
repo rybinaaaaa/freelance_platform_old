@@ -3,7 +3,6 @@ package freelanceplatform.controllers;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Solution;
 import freelanceplatform.services.SolutionService;
-import freelanceplatform.services.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -50,7 +49,7 @@ public class SolutionController {
     @PutMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody Solution updatedSolution){
         final Solution solution = solutionService.getById(id);
-        solution.setContent(updatedSolution.getContent());
+        solution.setLink(updatedSolution.getLink());
         solution.setDescription(updatedSolution.getDescription());
         try {
             solutionService.update(solution);

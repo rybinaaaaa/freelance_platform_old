@@ -47,7 +47,7 @@ public class UserServiceTest {
         Optional<User> newUserOptional = userRepository.getByUsername(user.getUsername());
         User newUser = newUserOptional.get();
         newUser.setFirstName("Test");
-        userService.update(newUser);
+        userService.update(newUser.getId(), newUser);
 
         assertEquals("Test", userRepository.getByUsername(user.getUsername()).get().getFirstName());
     }

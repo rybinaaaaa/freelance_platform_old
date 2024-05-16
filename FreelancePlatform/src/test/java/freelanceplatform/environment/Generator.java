@@ -2,7 +2,6 @@ package freelanceplatform.environment;
 
 import freelanceplatform.model.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Random;
 
@@ -65,11 +64,7 @@ public class Generator {
         final Solution solution = new Solution();
         solution.setTask(generateTask());
         solution.setDescription("description" + randomInt());
-        byte[] content = new byte[1024];
-        for (int i = 0; i < content.length; i++) {
-            content[i] = (byte) randomInt();
-        }
-        solution.setContent(content);
+        solution.setLink("github/io");
         return solution;
     }
 }
