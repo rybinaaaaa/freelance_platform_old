@@ -4,6 +4,7 @@ import freelanceplatform.data.ResumeRepository;
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
+import freelanceplatform.kafka.UserCreatedProducer;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,15 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final ResumeRepository resumeRepository;
-
     private final PasswordEncoder passwordEncoder;
+    private final UserCreatedProducer userCreatedProducer;
 
     @Autowired
-    public UserService(UserRepository userRepository, ResumeRepository resumeRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, ResumeRepository resumeRepository, PasswordEncoder passwordEncoder, UserCreatedProducer userCreatedProducer) {
         this.userRepository = userRepository;
         this.resumeRepository = resumeRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userCreatedProducer = userCreatedProducer;
     }
 
     @Transactional
@@ -60,6 +62,7 @@ public class UserService {
         }
         user.encodePassword(passwordEncoder);
         userRepository.save(user);
+        userCreatedProducer.sendMessage(String.format("User %s create", user.getUsername()));
     }
 
     @Transactional

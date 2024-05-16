@@ -11,7 +11,7 @@ spring:
     username: myuser
     password: secret
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 172.21.122.2:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
