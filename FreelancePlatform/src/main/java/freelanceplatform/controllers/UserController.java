@@ -12,8 +12,6 @@ import freelanceplatform.services.TaskService;
 import freelanceplatform.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,7 +44,6 @@ public class UserController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
         try {
-            log.info("fetching with db");
             final UserDTO userDTO = mapper.userToDTO(userService.find(id));
             return ResponseEntity.ok(userDTO);
         } catch (NotFoundException e) {
