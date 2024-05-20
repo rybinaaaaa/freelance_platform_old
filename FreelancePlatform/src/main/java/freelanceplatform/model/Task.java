@@ -1,13 +1,12 @@
 package freelanceplatform.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -57,8 +56,10 @@ public class Task extends AbstractEntity {
     @JoinColumn(name = "solution_id")
     private Solution solution;
 
-    public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment, TaskType type) {
-        this.customer = customer;
+    public Task(
+//            User customer,
+            String title, String problem, LocalDateTime deadline, Double payment, TaskType type) {
+//        this.customer = customer;
         this.title = title;
         this.problem = problem;
         this.deadline = deadline;

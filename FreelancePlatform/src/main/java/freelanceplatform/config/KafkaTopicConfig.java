@@ -9,6 +9,12 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopicConfig {
 
     @Bean
+    public NewTopic userCreatedTopic() {
+        return TopicBuilder.name("user_created")
+                .build();
+    }
+
+    @Bean
     public NewTopic taskCreatedTopic() {
         return TopicBuilder.name("task_created")
                 .build();

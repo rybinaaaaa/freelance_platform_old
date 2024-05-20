@@ -2,7 +2,6 @@ package freelanceplatform.dto.entityCreationDTO;
 
 import freelanceplatform.model.TaskStatus;
 import freelanceplatform.model.TaskType;
-import freelanceplatform.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,8 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TaskCreationDTO {
 
-    private final Integer id;
-    private User customer;
+//    private final Integer id;
+//    private User customer;
     private String title;
     private String problem;
     private LocalDateTime deadline;

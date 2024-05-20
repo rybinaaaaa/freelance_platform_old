@@ -6,6 +6,7 @@ import freelanceplatform.data.TaskRepository;
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
+import freelanceplatform.kafka.TaskCreatedProducer;
 import freelanceplatform.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,25 +17,27 @@ import java.util.Objects;
 import java.util.Optional;
 
 
-//todo добавить логику нотификации в методы
 @Service
 public class TaskService {
 
     private final TaskRepository taskRepo;
     private final UserRepository userRepo;
     private final SolutionRepository solutionRepo;
+    private final TaskCreatedProducer taskCreatedProducer;
 
     @Autowired
-    public TaskService(TaskRepository taskRepo, UserRepository userRepo, SolutionRepository solutionRepo) {
+    public TaskService(TaskRepository taskRepo, UserRepository userRepo, SolutionRepository solutionRepo, TaskCreatedProducer taskCreatedProducer) {
         this.taskRepo = taskRepo;
         this.userRepo = userRepo;
         this.solutionRepo = solutionRepo;
+        this.taskCreatedProducer = taskCreatedProducer;
     }
 
     @Transactional
     public void save(Task task){
         Objects.requireNonNull(task);
         taskRepo.save(task);
+        taskCreatedProducer.sendMessage(String.format("Task %s create", task.getTitle()));
     }
 
     @Transactional(readOnly = true)

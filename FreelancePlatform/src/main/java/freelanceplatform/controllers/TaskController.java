@@ -43,8 +43,10 @@ public class TaskController {
 
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> save(@RequestBody TaskCreationDTO taskDTO){
+    public ResponseEntity<Void> save(@RequestBody TaskCreationDTO taskDTO, Authentication auth){
+        final User user = ((UserDetails) auth.getPrincipal()).getUser();
         final Task task = mapper.taskDTOToTask(taskDTO);
+        task.setCustomer(user);
         taskService.save(task);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
