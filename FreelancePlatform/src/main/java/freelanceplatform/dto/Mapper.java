@@ -88,13 +88,13 @@ public class Mapper {
 
     public Task taskDTOToTask(TaskCreationDTO taskDTO) {
         Task task = new Task(
-                taskDTO.getCustomer(),
+//                taskDTO.getCustomer(),
                 taskDTO.getTitle(),
                 taskDTO.getProblem(),
                 taskDTO.getDeadline(),
                 taskDTO.getPayment(),
                 taskDTO.getType());
-        task.setId(taskDTO.getId());
+//        task.setId(taskDTO.getId());
         task.setStatus(taskDTO.getTaskStatus());
         return task;
     }
