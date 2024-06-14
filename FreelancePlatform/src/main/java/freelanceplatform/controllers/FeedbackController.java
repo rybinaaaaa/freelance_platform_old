@@ -26,12 +26,16 @@ public class FeedbackController {
 
     @GetMapping("/{id}")
     public ResponseEntity<FeedbackDTO> findById(@PathVariable Integer id) {
-        return feedbackService.findById(id).map(fb -> ResponseEntity.ok(mapper.feedbackToFeedbackDto(fb))).orElse(ResponseEntity.notFound().build());
+        return feedbackService.findById(id)
+                .map(fb -> ResponseEntity
+                        .ok(mapper.feedbackToFeedbackDto(fb)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping()
     public ResponseEntity<List<FeedbackDTO>> findAll() {
-        return ResponseEntity.ok(feedbackService.findAll().stream().map(mapper::feedbackToFeedbackDto).toList());
+        return ResponseEntity.ok(feedbackService.findAll().stream()
+                .map(mapper::feedbackToFeedbackDto).toList());
     }
 
     @PreAuthorize("hasRole({'ROLE_USER', 'ROLE_ADMIN'})")
@@ -65,6 +69,8 @@ public class FeedbackController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable Integer id) {
-        return feedbackService.deleteById(id)? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        return feedbackService.deleteById(id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }

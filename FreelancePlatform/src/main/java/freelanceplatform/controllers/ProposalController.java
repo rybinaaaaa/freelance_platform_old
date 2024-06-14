@@ -26,12 +26,15 @@ public class ProposalController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProposalDTO> findById(@PathVariable Integer id) {
-        return proposalService.findById(id).map(pr -> ResponseEntity.ok(mapper.proposalToProposalDTO(pr))).orElse(ResponseEntity.notFound().build());
+        return proposalService.findById(id)
+                .map(pr -> ResponseEntity.ok(mapper.proposalToProposalDTO(pr)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping()
     public ResponseEntity<List<ProposalDTO>> findAll() {
-        return ResponseEntity.ok(proposalService.findAll().stream().map(mapper::proposalToProposalDTO).toList());
+        return ResponseEntity.ok(proposalService.findAll().stream()
+                .map(mapper::proposalToProposalDTO).toList());
     }
 
     @PreAuthorize("hasRole({'ROLE_USER', 'ROLE_ADMIN'})")
@@ -46,7 +49,7 @@ public class ProposalController {
             ));
             return ResponseEntity.ok().build();
         } catch (NotFoundException e) {
-            return  ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -63,6 +66,8 @@ public class ProposalController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable Integer id) {
-        return proposalService.deleteById(id)? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        return proposalService.deleteById(id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }
