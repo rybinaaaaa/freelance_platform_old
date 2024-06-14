@@ -66,7 +66,7 @@ public class UserService {
     }
 
     @Transactional
-    @CachePut(value = "users", key = "#id")
+//    @CachePut(value = "users", key = "#id")
     public User update(Integer id, User user){
         Objects.requireNonNull(user);
         if (exists(user.getId())) {

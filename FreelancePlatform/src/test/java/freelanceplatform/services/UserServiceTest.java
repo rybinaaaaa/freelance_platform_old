@@ -44,12 +44,15 @@ public class UserServiceTest {
     @Test
     public void updateUserActuallyUpdates() {
         userService.save(user);
+
         Optional<User> newUserOptional = userRepository.getByUsername(user.getUsername());
+        assertTrue(newUserOptional.isPresent(), "User should be present in the database");
+
         User newUser = newUserOptional.get();
-        newUser.setFirstName("Test");
+        newUser.setUsername("Test");
         userService.update(newUser.getId(), newUser);
 
-        assertEquals("Test", userRepository.getByUsername(user.getUsername()).get().getFirstName());
+        assertEquals("Test", userRepository.getByUsername(user.getUsername()).get().getUsername());
     }
 
     @Test
