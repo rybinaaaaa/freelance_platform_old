@@ -11,9 +11,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest
 @Transactional
-@Sql({
-        "classpath:sql/init2.sql"
-})
 public abstract class IntegrationTestBase {
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
             "postgres:16-alpine"

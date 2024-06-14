@@ -1,6 +1,7 @@
 package freelanceplatform.services;
 import freelanceplatform.model.Feedback;
 import freelanceplatform.utils.IntegrationTestBase;
+import lombok.RequiredArgsConstructor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

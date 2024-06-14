@@ -3,7 +3,8 @@ spring:
     name: FreelancePlatform
   jpa:
     hibernate:
-      ddl-auto: create-drop
+#      ddl-auto: create-drop
+      ddl-auto: validate
     show-sql: true
   datasource:
     driver-class-name: org.postgresql.Driver

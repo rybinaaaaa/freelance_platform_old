@@ -23,10 +23,10 @@ public class User extends AbstractEntity {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "first_name")
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "last_name")
     private String lastName;
 
     @Column(nullable = false, unique = true)
@@ -39,7 +39,7 @@ public class User extends AbstractEntity {
     private int rating;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
+    @Column(nullable = false)
     private Role role;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)

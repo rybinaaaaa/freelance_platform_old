@@ -16,7 +16,8 @@ public class Solution extends AbstractEntity{
     @OneToOne(mappedBy = "solution", optional = false)
     private Task task;
 
-    @Column(nullable = false)
+    @Lob
+    @Column
     private String description;
 
     @Lob

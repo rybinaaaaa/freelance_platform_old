@@ -17,7 +17,7 @@ public class Resume extends AbstractEntity{
     private String filename;
 
     @Lob
-    @Column(nullable = false)
+    @Column
     private byte[] content;
 
     @OneToOne
