@@ -33,7 +33,7 @@ public class UserService {
     }
 
     @Transactional
-    @Cacheable(value = "users", key = "#id")
+//    @Cacheable(value = "users", key = "#id")
     public User find(Integer id) {
         Objects.requireNonNull(id);
         Optional<User> userOptional = userRepository.findById(id);
