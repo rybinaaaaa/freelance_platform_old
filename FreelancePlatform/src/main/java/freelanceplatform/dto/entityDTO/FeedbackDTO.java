@@ -1,12 +1,13 @@
 package freelanceplatform.dto.entityDTO;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Value
+@Data@AllArgsConstructor
 public class FeedbackDTO {
     Integer id;
-    UserDTO sender;
-    UserDTO receiver;
+    Integer senderId;
+    Integer receiverId;
     Integer rating;
     String comment;
 }

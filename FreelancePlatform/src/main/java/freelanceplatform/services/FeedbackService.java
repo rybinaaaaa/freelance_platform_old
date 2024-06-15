@@ -34,16 +34,12 @@ public class FeedbackService {
 
     @Transactional
     public Feedback save(Feedback feedback) {
-        Optional.ofNullable(feedback.getReceiver()).ifPresent(
-                maybeReceiver -> {
-                    this.getUser(maybeReceiver.getId()).ifPresent(user -> user.addReceivedFeedback(feedback));
-                }
-        );
-        Optional.ofNullable(feedback.getSender()).ifPresent(
-                maybeSender -> {
-                    this.getUser(maybeSender.getId()).ifPresent(user -> user.addSentFeedback(feedback));
-                }
-        );
+        Optional.ofNullable(feedback.getReceiver())
+                .flatMap(maybeReceiver -> this.getUser(maybeReceiver.getId()))
+                .ifPresent(user -> user.addReceivedFeedback(feedback));
+        Optional.ofNullable(feedback.getSender())
+                .flatMap(maybeSender -> this.getUser(maybeSender.getId()))
+                .ifPresent(user -> user.addSentFeedback(feedback));
         return feedbackRepository.save(feedback);
     }
 

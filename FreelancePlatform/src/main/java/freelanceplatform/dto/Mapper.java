@@ -49,22 +49,20 @@ public class Mapper {
         return new ProposalDTO(
                 proposal.getId(),
                 Optional.ofNullable(proposal.getFreelancer())
-                        .map(this::userToDTO)
+                        .map(User::getId)
                         .orElse(null),
                 Optional.ofNullable(proposal.getTask())
-                        .map(this::taskToTaskDTO)
+                        .map(Task::getId)
                         .orElse(null));
     }
 
     public Proposal proposalDTOToProposal(ProposalDTO proposalDTO) {
         return new Proposal(
                 proposalDTO.getId(),
-                Optional.ofNullable(proposalDTO.getFreelancer())
-                        .map(UserDTO::getId)
+                Optional.ofNullable(proposalDTO.getFreelancerId())
                         .map(userService::find)
                         .orElse(null),
-                Optional.ofNullable(proposalDTO.getTask())
-                        .map(TaskDTO::getId)
+                Optional.ofNullable(proposalDTO.getTaskId())
                         .map(taskService::getById)
                         .orElse(null)
         );
@@ -105,13 +103,11 @@ public class Mapper {
         feedback.setRating(fb.getRating());
         feedback.setComment(fb.getComment());
 
-        User receiver = Optional.ofNullable(fb.getReceiver())
-                .map(UserDTO::getId)
+        User receiver = Optional.ofNullable(fb.getReceiverId())
                 .map(userService::find)
                 .orElse(null);
 
-        User sender = Optional.ofNullable(fb.getSender())
-                .map(UserDTO::getId)
+        User sender = Optional.ofNullable(fb.getSenderId())
                 .map(userService::find)
                 .orElse(null);
 
@@ -124,8 +120,8 @@ public class Mapper {
     public FeedbackDTO feedbackToFeedbackDto(Feedback fb) {
         return new FeedbackDTO(
                 fb.getId(),
-                userToDTO(fb.getSender()),
-                userToDTO(fb.getReceiver()),
+                fb.getSender().getId(),
+                fb.getReceiver().getId(),
                 fb.getRating(),
                 fb.getComment()
         );

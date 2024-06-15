@@ -32,11 +32,8 @@ public class ProposalService {
 
     @Transactional
     public Proposal save(Proposal proposal) {
-        Optional.ofNullable(proposal.getFreelancer()).ifPresent(
-                maybeFreelancer -> {
-                    this.getUser(maybeFreelancer.getId()).ifPresent(freelancer1 -> freelancer1.addProposal(proposal));
-                }
-        );
+        Optional.ofNullable(proposal.getFreelancer()).flatMap(maybeFreelancer -> userRepository.findById(maybeFreelancer.getId()))
+                .ifPresent(freelancer1 -> freelancer1.addProposal(proposal));
         Optional.ofNullable(proposal.getTask()).ifPresent(
                 maybeTask -> {
                     Optional.ofNullable(maybeTask.getId())
@@ -69,10 +66,5 @@ public class ProposalService {
             return true;
         });
         return false;
-    }
-
-    @Transactional(readOnly = true)
-    protected Optional<User> getUser(Integer id) {
-        return Optional.ofNullable(id).flatMap(userRepository::findById);
     }
 }
