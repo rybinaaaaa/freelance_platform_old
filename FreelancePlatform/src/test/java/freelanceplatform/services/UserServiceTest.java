@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,7 +49,7 @@ public class UserServiceTest {
 
         User newUser = newUserOptional.get();
         newUser.setUsername("Test");
-        userService.update(newUser.getId(), newUser);
+        userService.update(newUser);
 
         assertEquals("Test", userRepository.getByUsername(user.getUsername()).get().getUsername());
     }

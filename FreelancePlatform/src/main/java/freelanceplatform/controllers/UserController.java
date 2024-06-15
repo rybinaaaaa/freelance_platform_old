@@ -108,7 +108,7 @@ public class UserController {
             userToUpdate.setLastName(userDTOToUpdate.getLastName());
             userToUpdate.setEmail(userDTOToUpdate.getEmail());
 
-            userService.update(id, userToUpdate);
+            userService.update(userToUpdate);
 
             final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/current");
             return new ResponseEntity<>(headers, HttpStatus.OK);

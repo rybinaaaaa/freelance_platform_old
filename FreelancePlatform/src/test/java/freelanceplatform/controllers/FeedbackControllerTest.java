@@ -1,21 +1,15 @@
 package freelanceplatform.controllers;
 
-import freelanceplatform.model.Feedback;
 import freelanceplatform.services.FeedbackService;
 import freelanceplatform.utils.IntegrationTestBase;
-import freelanceplatform.utils.httpAuths.WithAuthentificatedAdmin;
-import freelanceplatform.utils.httpAuths.WithAuthentificatedUser;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.testcontainers.shaded.org.hamcrest.collection.IsCollectionWithSize;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
