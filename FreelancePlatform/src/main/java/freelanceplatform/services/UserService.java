@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * The User service
+ */
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -30,6 +33,11 @@ public class UserService {
         this.userCreatedProducer = userCreatedProducer;
     }
 
+    /**
+     * Returns User by id
+     * @param id user's id
+     * @return user
+     */
     @Transactional
 //    @Cacheable(value = "users", key = "#id")
     public User find(Integer id) {
@@ -39,6 +47,11 @@ public class UserService {
         return userOptional.get();
     }
 
+    /**
+     * Return User by username
+     * @param username user's username
+     * @return user
+     */
     @Transactional
     public User findByUsername(String username) {
         Objects.requireNonNull(username);
@@ -47,11 +60,19 @@ public class UserService {
         return userOptional.get();
     }
 
+    /**
+     * Returns all users
+     * @return all users
+     */
     @Transactional
     public Iterable<User> findAll() {
         return userRepository.findAll();
     }
 
+    /**
+     * Saves the user
+     * @param user to save
+     */
     @Transactional
     public void save(User user){
         Objects.requireNonNull(user);
@@ -63,6 +84,11 @@ public class UserService {
         userCreatedProducer.sendMessage(String.format("User %s create", user.getUsername()));
     }
 
+    /**
+     * Updates the user
+     * @param user the user data to update
+     * @return updated user
+     */
     @Transactional
 //    @CachePut(value = "users", key = "#id")
     public User update(User user){
@@ -76,6 +102,10 @@ public class UserService {
         }
     }
 
+    /**
+     * Deletes user
+     * @param user
+     */
     @Transactional
     public void delete(User user){
         Objects.requireNonNull(user);
@@ -86,11 +116,22 @@ public class UserService {
         }
     }
 
+    /**
+     * Checks if user exists
+     * @param id user's id
+     * @return true if exists / false if not
+     */
     public boolean exists(Integer id){
         Objects.requireNonNull(id);
         return userRepository.existsById(id);
     }
 
+    /**
+     * Saves user's resume
+     * @param filename resume name
+     * @param content resume content
+     * @param user user to add this resume
+     */
     @Transactional
     public void saveResume(String filename, byte[] content, User user) {
         if (content.length == 0 || filename.equals("")) throw new ValidationException("Bad inputs");
@@ -101,6 +142,11 @@ public class UserService {
         resumeRepository.save(resume);
     }
 
+    /**
+     * Returns user's resume
+     * @param user whose resume to find
+     * @return resume
+     */
     @Transactional
     public Resume getUsersResume(User user) {
         Optional<Resume> resume = resumeRepository.findByUserId(user.getId());

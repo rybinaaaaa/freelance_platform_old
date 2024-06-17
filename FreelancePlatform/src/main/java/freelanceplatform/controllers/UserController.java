@@ -24,6 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * REST controller for managing users.
+ * This controller provides endpoints for user CRUD operations and other user-related actions.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/rest/users")
@@ -34,6 +38,12 @@ public class UserController {
     private final TaskService taskService;
     private final Mapper mapper;
 
+    /**
+     * Constructs the UserController with the necessary dependencies
+     * @param userService the service for managing users
+     * @param taskService the service for managing tasks
+     * @param mapper the mapper for converting between entities and DTOs
+     */
     @Autowired
     public UserController(UserService userService, TaskService taskService, Mapper mapper) {
         this.userService = userService;
@@ -41,6 +51,12 @@ public class UserController {
         this.mapper = mapper;
     }
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param id the ID of the user
+     * @return the ResponseEntity with the user data or 404 if not found
+     */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
         try {
@@ -51,6 +67,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Retrieves a user by their username.
+     *
+     * @param username the username of the user
+     * @return the ResponseEntity with the user data or 404 if not found
+     */
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> getUserByUserName(@PathVariable String username) {
         try {
@@ -61,6 +83,11 @@ public class UserController {
         }
     }
 
+    /**
+     * Retrieves all users.
+     *
+     * @return an iterable of all user DTOs
+     */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Iterable<UserDTO> getAllUsers() {
         Iterable<User> users = userService.findAll();
@@ -73,6 +100,12 @@ public class UserController {
         return userDTOs;
     }
 
+    /**
+     * Signs up a new user.
+     *
+     * @param userCreationDTO the user creation data transfer object
+     * @return the ResponseEntity indicating the result of the operation
+     */
     @PreAuthorize("(!#userCreationDTO.isAdmin() && anonymous) || hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> signUp(@RequestBody UserCreationDTO userCreationDTO) {
@@ -82,6 +115,12 @@ public class UserController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
+    /**
+     * Retrieves the current authenticated user.
+     *
+     * @param auth the authentication object
+     * @return the user DTO of the current user
+     */
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER', 'ROLE_GUEST')")
     @GetMapping(value = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO getCurrent(Authentication auth) {
@@ -89,6 +128,14 @@ public class UserController {
         return mapper.userToDTO(((UserDetails) auth.getPrincipal()).getUser());
     }
 
+    /**
+     * Updates a user's information.
+     *
+     * @param id the ID of the user to update
+     * @param userDTOToUpdate the user data to update
+     * @param auth the authentication object
+     * @return the ResponseEntity indicating the result of the operation
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateUser(@PathVariable Integer id,
@@ -117,6 +164,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Deletes a user by an admin.
+     *
+     * @param id the ID of the user to delete
+     * @return the ResponseEntity indicating the result of the operation
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -129,6 +182,12 @@ public class UserController {
         } else return ResponseEntity.notFound().build();
     }
 
+    /**
+     * Deletes the current authenticated user's account.
+     *
+     * @param auth the authentication object
+     * @return the ResponseEntity indicating the result of the operation
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -141,6 +200,12 @@ public class UserController {
         } else return ResponseEntity.notFound().build();
     }
 
+    /**
+     * Retrieves the resume of the current authenticated user.
+     *
+     * @param auth the authentication object
+     * @return the ResponseEntity with the resume or 404 if not found
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/myResume")
     public ResponseEntity<Resume> getResume(Authentication auth) {
@@ -153,6 +218,14 @@ public class UserController {
         }
     }
 
+    /**
+     * Saves the resume of the current authenticated user.
+     *
+     * @param filename the filename of the resume
+     * @param file the resume file
+     * @param auth the authentication object
+     * @return the ResponseEntity indicating the result of the operation
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/addResume")
     public ResponseEntity<Void> saveResume(@RequestParam("filename") String filename,

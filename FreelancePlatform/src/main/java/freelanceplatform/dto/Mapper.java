@@ -14,6 +14,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * Mapper class for converting between entities and DTOs.
+ * This class provides methods to map User, Proposal, Task, and Feedback entities to their corresponding DTOs and vice versa.
+ */
 @Component
 @RequiredArgsConstructor
 public class Mapper {
@@ -21,6 +25,12 @@ public class Mapper {
     private final UserService userService;
     private final TaskService taskService;
 
+    /**
+     * Converts a User entity to a UserDTO.
+     *
+     * @param user the User entity to convert
+     * @return the converted UserDTO
+     */
     public UserDTO userToDTO(User user) {
         return new UserDTO(
                 user.getId(),
@@ -32,6 +42,12 @@ public class Mapper {
                 user.getRole());
     }
 
+    /**
+     * Converts a UserCreationDTO to a User entity.
+     *
+     * @param userDTO the UserCreationDTO to convert
+     * @return the converted User entity
+     */
     public User userDTOToUser(UserCreationDTO userDTO) {
         return User.builder()
                 .username(userDTO.getUsername())
@@ -41,10 +57,14 @@ public class Mapper {
                 .password(userDTO.getPassword())
                 .role(userDTO.getRole())
                 .build();
-//        return new User(userDTO.getUsername(), userDTO.getFirstName(),
-//                userDTO.getLastName(), userDTO.getEmail(), userDTO.getPassword(), userDTO.getRole());
     }
 
+    /**
+     * Converts a Proposal entity to a ProposalDTO.
+     *
+     * @param proposal the Proposal entity to convert
+     * @return the converted ProposalDTO
+     */
     public ProposalDTO proposalToProposalDTO(Proposal proposal) {
         return new ProposalDTO(
                 proposal.getId(),
@@ -56,6 +76,12 @@ public class Mapper {
                         .orElse(null));
     }
 
+    /**
+     * Converts a ProposalDTO to a Proposal entity.
+     *
+     * @param proposalDTO the ProposalDTO to convert
+     * @return the converted Proposal entity
+     */
     public Proposal proposalDTOToProposal(ProposalDTO proposalDTO) {
         return new Proposal(
                 proposalDTO.getId(),
@@ -68,6 +94,12 @@ public class Mapper {
         );
     }
 
+    /**
+     * Converts a Task entity to a TaskDTO.
+     *
+     * @param task the Task entity to convert
+     * @return the converted TaskDTO
+     */
     public TaskDTO taskToTaskDTO(Task task) {
         TaskDTO taskDTO = new TaskDTO();
         taskDTO.setId(task.getId());
@@ -84,6 +116,12 @@ public class Mapper {
         return taskDTO;
     }
 
+    /**
+     * Converts a TaskCreationDTO to a Task entity.
+     *
+     * @param taskDTO the TaskCreationDTO to convert
+     * @return the converted Task entity
+     */
     public Task taskDTOToTask(TaskCreationDTO taskDTO) {
         Task task = new Task(
 //                taskDTO.getCustomer(),
@@ -97,6 +135,12 @@ public class Mapper {
         return task;
     }
 
+    /**
+     * Converts a FeedbackDTO to a Feedback entity.
+     *
+     * @param fb the FeedbackDTO to convert
+     * @return the converted Feedback entity
+     */
     public Feedback feedbackDtoToFeedback(FeedbackDTO fb) {
         Feedback feedback = new Feedback();
         feedback.setId(fb.getId());
@@ -117,6 +161,12 @@ public class Mapper {
         return feedback;
     }
 
+    /**
+     * Converts a Feedback entity to a FeedbackDTO.
+     *
+     * @param fb the Feedback entity to convert
+     * @return the converted FeedbackDTO
+     */
     public FeedbackDTO feedbackToFeedbackDto(Feedback fb) {
         return new FeedbackDTO(
                 fb.getId(),

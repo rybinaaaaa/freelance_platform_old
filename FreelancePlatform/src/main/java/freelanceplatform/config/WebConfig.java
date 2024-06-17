@@ -14,6 +14,10 @@ public class WebConfig implements WebMvcConfigurer {
         this.loggerInterceptor = loggerInterceptor;
     }
 
+    /**
+     * Adds custom interceptor
+     * @param registry
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loggerInterceptor).addPathPatterns("/**");
