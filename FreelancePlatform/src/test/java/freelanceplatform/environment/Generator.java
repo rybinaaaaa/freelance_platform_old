@@ -49,6 +49,22 @@ public class Generator {
         return task;
     }
 
+    public static Feedback generateFeedback(){
+        final Feedback fb = new Feedback();
+        fb.setComment("connent" + randomInt());
+        fb.setRating(randomInt());
+
+        User sender = Generator.generateUser();
+        sender.setRole(Role.USER);
+        fb.setSender(sender);
+
+        User receiver = Generator.generateUser();
+        receiver.setRole(Role.USER);
+        fb.setReceiver(receiver);
+
+        return fb;
+    }
+
     public static Resume generateResume() {
         final Resume resume = new Resume();
         byte[] content = new byte[1024];

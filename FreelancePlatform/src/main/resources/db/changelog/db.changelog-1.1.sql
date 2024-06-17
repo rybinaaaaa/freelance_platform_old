@@ -1,5 +1,5 @@
 INSERT INTO users (id, rating, email, first_name, last_name, password, role, username)
-VALUES (1, 80, 'user4@example.com', 'Michael', 'Brown', 'password4', 'USER', 'michaelbrown'),
+VALUES (1, 80, 'user4@example.com', 'Michael', 'Brown', 'password4', 'ADMIN', 'michaelbrown'),
        (2, 90, 'user5@example.com', 'Emily', 'Davis', 'password5', 'USER', 'emilydavis'),
        (3, 75, 'user6@example.com', 'William', 'Martinez', 'password6', 'USER', 'williammartinez'),
        (4, 85, 'user7@example.com', 'Sophia', 'Garcia', 'password7', 'USER', 'sophiagarcia'),

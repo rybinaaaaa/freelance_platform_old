@@ -7,9 +7,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-@WithMockUser(username = "test", password = "test", authorities = {"ADMIN"})
-public @interface WithAuthentificatedAdmin {
+@WithMockUser(username = "test", password = "test", authorities = {"ROLE_USER"})
+public @interface WithAuthenticatedUser {
 }

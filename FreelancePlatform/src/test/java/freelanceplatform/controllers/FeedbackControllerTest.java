@@ -1,20 +1,27 @@
 package freelanceplatform.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import freelanceplatform.dto.Mapper;
+import freelanceplatform.environment.Generator;
+import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Feedback;
+import freelanceplatform.model.Role;
+import freelanceplatform.model.User;
+import freelanceplatform.security.model.UserDetails;
 import freelanceplatform.services.FeedbackService;
+import freelanceplatform.services.UserService;
 import freelanceplatform.utils.IntegrationTestBase;
-import freelanceplatform.utils.httpAuths.WithAuthentificatedAdmin;
-import freelanceplatform.utils.httpAuths.WithAuthentificatedUser;
-import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.testcontainers.shaded.org.hamcrest.collection.IsCollectionWithSize;
 
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -23,39 +30,45 @@ class FeedbackControllerTest extends IntegrationTestBase {
 
     private final MockMvc mockMvc;
     private final FeedbackService feedbackService;
+    private final ObjectMapper objectMapper;
+    private final Mapper mapper;
+    private final UserService userService;
+
+    private User userAdmin;
+    private User emptyUser;
 
     @Autowired
-    FeedbackControllerTest(MockMvc mockMvc, FeedbackService feedbackService) {
+    public FeedbackControllerTest(MockMvc mockMvc, FeedbackService feedbackService, ObjectMapper objectMapper, Mapper mapper, UserService userService) {
         this.mockMvc = mockMvc;
         this.feedbackService = feedbackService;
+        this.objectMapper = objectMapper;
+        this.mapper = mapper;
+        this.userService = userService;
     }
 
-//    void init() {
-////        Sender sender
-//        Feedback feedback = new Feedback();
-//        feedback.setSender();
-//    }
+    @BeforeEach
+    void init() {
+        userAdmin = Generator.generateUser();
+        userAdmin.setRole(Role.ADMIN);
+        userService.save(userAdmin);
 
-//    @Test
-//    @WithAuthentificatedUser
-//    void findByIdReturnsStatusOk() throws Exception {
-//        mockMvc.perform(get("rest/feedbacks/1"))
-//                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
-//                .andExpect(MockMvcResultMatchers.model().attribute("id", 1));
-//    }
-//    @Test
-//    @WithAuthentificatedUser
-//    void findByIdReturnsStatusNotFound() throws Exception {
-//        mockMvc.perform(get("rest/feedbacks/-1"))
-//                .andExpect(MockMvcResultMatchers.status().isNotFound());
-//    }
-//
-//    @Test
-//    @WithAuthentificatedUser
-//    void findAllReturnsStatusOk() throws Exception {
-//        mockMvc.perform(get("rest/feedbacks"))
-//                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
-//    }
+        emptyUser = Generator.generateUser();
+        emptyUser.setRole(Role.USER);
+        userService.save(emptyUser);
+    }
+
+    @Test
+    void findByIdReturnsStatusOk() throws Exception {
+        mockMvc.perform(get("/rest/feedbacks/1"))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(jsonPath("$.id", equalTo(1)));
+    }
+
+    @Test
+    void findByIdReturnsStatusNotFound() throws Exception {
+        mockMvc.perform(get("/rest/feedbacks/-1"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
 
     @Test
     void findAllReturnsStatusOk() throws Exception {
@@ -65,47 +78,119 @@ class FeedbackControllerTest extends IntegrationTestBase {
                 .andExpect(jsonPath("$", hasSize(feedbackService.findAll().size())));
     }
 
-//    @Test
-//    @WithAuthentificatedAdmin
-//    void updateByAdminReturnsStatusNoContent() throws Exception {
-//
-//        mockMvc.perform(put("rest/feedbacks/1")
-//
-////                .andExpect(MockMvcResultMatchers.status().isForbidden());
-//    }
+    @Test
+    void updateByAdminReturnsStatusNoContent() throws Exception {
+        Feedback feedback = feedbackService.findById(1).orElseThrow(() -> new NotFoundException("Incorrect id in tests!"));
+        feedback.setComment("test");
 
-//    @Test
-//    @WithAuthentificatedUser
-//    void updateByUserReturnsStatusForbidden() {
-//    }
-//
-//    @Test
-//    @WithAuthentificatedUser
-//    void updateByUserReturnsStatusNoContent() {
-//    }
-//
-//    @Test
-//    @WithAuthentificatedUser
-//    void saveByUserReturnsStatusForbidden() {
-//    }
-//
-//    @Test
-//    @WithAuthentificatedUser
-//    void saveByUserReturnsStatusCreated() {
-//    }
-//
-//    @Test
-//    @WithAuthentificatedAdmin
-//    void saveByAdminReturnsStatusCreated() {
-//    }
-//
-//    @Test
-//    @WithAuthentificatedAdmin
-//    void deleteByAdminReturnsStatusNoContent() {
-//    }
-//
-//    @Test
-//    @WithAuthentificatedUser
-//    void deleteByUserReturnsStatusForbidden() {
-//    }
+
+        String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
+
+        mockMvc.perform(put("/rest/feedbacks/1")
+                        .with(user(new UserDetails(userAdmin)))
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(fb).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void updateByUserReturnsStatusForbidden() throws Exception {
+        Feedback feedback = feedbackService.findById(1).orElseThrow(() -> new NotFoundException("Incorrect id in tests!"));
+        feedback.setComment("test");
+
+
+        String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
+
+        mockMvc.perform(put("/rest/feedbacks/1")
+                        .with(user(new UserDetails(emptyUser)))
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(fb).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void updateByUserReturnsStatusNoContent() throws Exception {
+        Feedback feedback = feedbackService.findById(1).orElseThrow(() -> new NotFoundException("Incorrect id in tests!"));
+        feedback.setComment("test");
+
+
+        String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
+
+        mockMvc.perform(put("/rest/feedbacks/1")
+                        .with(user(new UserDetails(feedback.getSender())))
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(fb).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void saveByUserReturnsStatusForbidden() throws Exception {
+        Feedback feedback = Generator.generateFeedback();
+        userService.save(feedback.getSender());
+        userService.save(feedback.getReceiver());
+
+        String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
+
+        mockMvc.perform(post("/rest/feedbacks")
+                        .with(user(new UserDetails(emptyUser)))
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(fb).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void saveByUserReturnsStatusCreated() throws Exception {
+        Feedback feedback = Generator.generateFeedback();
+        userService.save(feedback.getSender());
+        userService.save(feedback.getReceiver());
+
+        String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
+
+        mockMvc.perform(post("/rest/feedbacks")
+                        .with(user(new UserDetails(feedback.getSender())))
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(fb).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void saveByAdminReturnsStatusCreated() throws Exception {
+        Feedback feedback = Generator.generateFeedback();
+        userService.save(feedback.getSender());
+        userService.save(feedback.getReceiver());
+
+        String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
+
+        mockMvc.perform(post("/rest/feedbacks")
+                        .with(user(new UserDetails(userAdmin)))
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(fb).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void deleteByAdminReturnsStatusNoContent() throws Exception {
+        Feedback feedback = feedbackService.findById(1).orElseThrow(() -> new NotFoundException("Incorrect id in tests!"));        feedback.setComment("test");
+
+        String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
+
+        mockMvc.perform(delete("/rest/feedbacks/1")
+                        .with(user(new UserDetails(userAdmin)))
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(fb).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteByUserReturnsStatusForbidden() throws Exception {
+        Feedback feedback = feedbackService.findById(1).orElseThrow(() -> new NotFoundException("Incorrect id in tests!"));
+
+        String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
+
+        mockMvc.perform(delete("/rest/feedbacks/1")
+                        .with(user(new UserDetails(emptyUser)))
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(fb).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
 }
