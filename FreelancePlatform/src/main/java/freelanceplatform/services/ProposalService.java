@@ -61,10 +61,10 @@ public class ProposalService {
 
     @Transactional
     public boolean deleteById(Integer id) {
-        proposalRepository.findById(id).map(proposal -> {
-            proposalRepository.delete(proposal);
-            return true;
-        });
-        return false;
+        return proposalRepository.findById(id)
+                .map(proposal -> {
+                    proposalRepository.delete(proposal);
+                    return true;
+                }).orElse(false);
     }
 }

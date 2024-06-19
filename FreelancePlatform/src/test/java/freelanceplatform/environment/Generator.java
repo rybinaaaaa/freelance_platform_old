@@ -83,4 +83,20 @@ public class Generator {
         solution.setLink("github/io");
         return solution;
     }
+
+    public static Proposal generateProposal() {
+        User user = generateUser();
+        user.setRole(Role.USER);
+
+        Task task = generateTask();
+        task.setCustomer(user);
+        task.setFreelancer(user);
+
+        Proposal proposal = new Proposal();
+        proposal.setTask(task);
+
+        proposal.setFreelancer(user);
+
+        return proposal;
+    }
 }

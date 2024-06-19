@@ -46,7 +46,7 @@ public class ProposalController {
                 .map(mapper::proposalToProposalDTO).toList());
     }
 
-    @PreAuthorize("hasRole({'ROLE_USER', 'ROLE_ADMIN'})")
+    @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody ProposalDTO proposalDTO, Authentication auth) {
         Objects.requireNonNull(proposalDTO);
@@ -57,13 +57,13 @@ public class ProposalController {
         Proposal newPr = mapper.proposalDTOToProposal(proposalDTO);
         try {
             proposalService.update(newPr);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PreAuthorize("hasRole({'ROLE_USER', 'ROLE_ADMIN'})")
+    @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PostMapping()
     public ResponseEntity<Void> save(@RequestBody ProposalDTO proposalDTO, Authentication auth) {
         Objects.requireNonNull(proposalDTO);
