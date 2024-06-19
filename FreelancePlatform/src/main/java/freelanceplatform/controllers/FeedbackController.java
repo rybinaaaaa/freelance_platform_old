@@ -7,6 +7,7 @@ import freelanceplatform.model.Feedback;
 import freelanceplatform.model.User;
 import freelanceplatform.security.model.UserDetails;
 import freelanceplatform.services.FeedbackService;
+import freelanceplatform.services.security.UserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 public class FeedbackController {
 
     private final FeedbackService feedbackService;
+    private final UserDetailsService userDetailsService;
     private final Mapper mapper;
 
     private final static ResponseEntity<Void> FORBIDDEN1 = new ResponseEntity<>(FORBIDDEN);
@@ -48,7 +50,7 @@ public class FeedbackController {
                 .map(mapper::feedbackToFeedbackDto).toList());
     }
 
-    @PreAuthorize("hasRole({'ROLE_USER', 'ROLE_ADMIN'})")
+    @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody FeedbackDTO feedbackDTO, Authentication auth) {
         Objects.requireNonNull(feedbackDTO);
@@ -66,7 +68,7 @@ public class FeedbackController {
     }
 
 
-    @PreAuthorize("hasRole({'ROLE_USER', 'ROLE_ADMIN'})")
+    @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PostMapping()
     public ResponseEntity<Void> save(@RequestBody FeedbackDTO feedbackDTO, Authentication auth) {
         Objects.requireNonNull(feedbackDTO);

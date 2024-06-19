@@ -43,19 +43,19 @@ public class User extends AbstractEntity {
     private Role role;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<Task> postedTasks;
+    private List<Task> postedTasks = new ArrayList<>();
 
     @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
-    private List<Proposal> proposals;
+    private List<Proposal> proposals = new ArrayList<>();
 
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
-    private List<Feedback> receivedFeedbacks;
+    private List<Feedback> receivedFeedbacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
-    private List<Feedback> sentFeedbacks;
+    private List<Feedback> sentFeedbacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
-    private List<Task> takenTasks;
+    private List<Task> takenTasks = new ArrayList<>();
 
     public void addProposal(Proposal... proposals) {
         this.proposals.addAll(Arrays.asList(proposals));

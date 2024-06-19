@@ -49,6 +49,22 @@ public class Generator {
         return task;
     }
 
+    public static Feedback generateFeedback(){
+        final Feedback fb = new Feedback();
+        fb.setComment("connent" + randomInt());
+        fb.setRating(randomInt());
+
+        User sender = Generator.generateUser();
+        sender.setRole(Role.USER);
+        fb.setSender(sender);
+
+        User receiver = Generator.generateUser();
+        receiver.setRole(Role.USER);
+        fb.setReceiver(receiver);
+
+        return fb;
+    }
+
     public static Resume generateResume() {
         final Resume resume = new Resume();
         byte[] content = new byte[1024];
@@ -66,5 +82,21 @@ public class Generator {
         solution.setDescription("description" + randomInt());
         solution.setLink("github/io");
         return solution;
+    }
+
+    public static Proposal generateProposal() {
+        User user = generateUser();
+        user.setRole(Role.USER);
+
+        Task task = generateTask();
+        task.setCustomer(user);
+        task.setFreelancer(user);
+
+        Proposal proposal = new Proposal();
+        proposal.setTask(task);
+
+        proposal.setFreelancer(user);
+
+        return proposal;
     }
 }

@@ -9,5 +9,4 @@ class FreelancePlatformApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
