@@ -12,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service class for managing feedback.
+ */
 @Service
 @RequiredArgsConstructor
 public class FeedbackService {
@@ -19,6 +22,12 @@ public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Updates an existing feedback.
+     *
+     * @param newFb the feedback to update
+     * @return the updated feedback
+     */
     @Transactional
     public Feedback update(Feedback newFb) {
         return feedbackRepository.findById(newFb.getId()).map(fb -> {
@@ -32,6 +41,12 @@ public class FeedbackService {
         }).orElseThrow(() -> new NotFoundException("Feedback with id " + newFb.getId() + " not found."));
     }
 
+    /**
+     * Saves a new feedback.
+     *
+     * @param feedback the feedback to save
+     * @return the saved feedback
+     */
     @Transactional
     public Feedback save(Feedback feedback) {
         Optional.ofNullable(feedback.getReceiver())
@@ -43,16 +58,33 @@ public class FeedbackService {
         return feedbackRepository.save(feedback);
     }
 
+    /**
+     * Finds a feedback by its ID.
+     *
+     * @param id the ID of the feedback
+     * @return an Optional containing the found feedback, or empty if not found
+     */
     @Transactional(readOnly = true)
     public Optional<Feedback> findById(Integer id) {
         return feedbackRepository.findById(id);
     }
 
+    /**
+     * Finds all feedbacks.
+     *
+     * @return a list of all feedbacks
+     */
     @Transactional(readOnly = true)
     public List<Feedback> findAll() {
         return feedbackRepository.findAll();
     }
 
+    /**
+     * Deletes a feedback by its ID.
+     *
+     * @param id the ID of the feedback to delete
+     * @return true if the feedback was deleted, false otherwise
+     */
     @Transactional
     public boolean deleteById(Integer id) {
         return feedbackRepository.findById(id)
@@ -71,16 +103,34 @@ public class FeedbackService {
                 }).orElse(false);
     }
 
+    /**
+     * Finds feedbacks by their receiver.
+     *
+     * @param receiver the receiver of the feedbacks
+     * @return a list of feedbacks received by the given user
+     */
     @Transactional(readOnly = true)
     public List<Feedback> findByReceiver(User receiver) {
         return feedbackRepository.findByReceiver(receiver);
     }
 
+    /**
+     * Finds feedbacks by their sender.
+     *
+     * @param sender the sender of the feedbacks
+     * @return a list of feedbacks sent by the given user
+     */
     @Transactional(readOnly = true)
     public List<Feedback> findBySender(User sender) {
         return feedbackRepository.findBySender(sender);
     }
 
+    /**
+     * Finds a user by their ID.
+     *
+     * @param id the ID of the user
+     * @return an Optional containing the found user, or empty if not found
+     */
     @Transactional(readOnly = true)
     protected Optional<User> getUser(Integer id) {
         return Optional.ofNullable(id).flatMap(userRepository::findById);

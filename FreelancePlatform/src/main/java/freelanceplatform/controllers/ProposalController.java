@@ -22,6 +22,9 @@ import java.util.Objects;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
+/**
+ * Controller for managing proposals.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/rest/proposals")
@@ -33,6 +36,12 @@ public class ProposalController {
 
     private final static ResponseEntity<Void> FORBIDDEN1 = new ResponseEntity<>(FORBIDDEN);
 
+    /**
+     * Finds a proposal by its ID.
+     *
+     * @param id the ID of the proposal
+     * @return the proposal DTO
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ProposalDTO> findById(@PathVariable Integer id) {
         return proposalService.findById(id)
@@ -40,12 +49,25 @@ public class ProposalController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Finds all proposals.
+     *
+     * @return a list of all proposal DTOs
+     */
     @GetMapping()
     public ResponseEntity<List<ProposalDTO>> findAll() {
         return ResponseEntity.ok(proposalService.findAll().stream()
                 .map(mapper::proposalToProposalDTO).toList());
     }
 
+    /**
+     * Updates an existing proposal.
+     *
+     * @param id the ID of the proposal to update
+     * @param proposalDTO the proposal DTO with updated information
+     * @param auth the authentication object
+     * @return a response entity indicating the outcome
+     */
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody ProposalDTO proposalDTO, Authentication auth) {
@@ -63,6 +85,13 @@ public class ProposalController {
         }
     }
 
+    /**
+     * Saves a new proposal.
+     *
+     * @param proposalDTO the proposal DTO to save
+     * @param auth the authentication object
+     * @return a response entity indicating the outcome
+     */
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PostMapping()
     public ResponseEntity<Void> save(@RequestBody ProposalDTO proposalDTO, Authentication auth) {
@@ -81,6 +110,12 @@ public class ProposalController {
         }
     }
 
+    /**
+     * Deletes a proposal by its ID.
+     *
+     * @param id the ID of the proposal to delete
+     * @return a response entity indicating the outcome
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable Integer id) {
@@ -89,6 +124,13 @@ public class ProposalController {
                 : ResponseEntity.notFound().build();
     }
 
+    /**
+     * Checks if the authenticated user has access to the proposal.
+     *
+     * @param proposalDTO the proposal DTO
+     * @param auth the authentication object
+     * @return true if the user has access, false otherwise
+     */
     private static Boolean hasUserAccess(ProposalDTO proposalDTO, Authentication auth) {
         User user = ((UserDetails) auth.getPrincipal()).getUser();
         return user.isAdmin() || user.getId().equals(proposalDTO.getFreelancerId());

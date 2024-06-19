@@ -24,6 +24,9 @@ import java.util.Objects;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
+/**
+ * Controller for managing feedbacks.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/rest/feedbacks")
@@ -36,6 +39,12 @@ public class FeedbackController {
 
     private final static ResponseEntity<Void> FORBIDDEN1 = new ResponseEntity<>(FORBIDDEN);
 
+    /**
+     * Finds a feedback by its ID.
+     *
+     * @param id the ID of the feedback
+     * @return the feedback DTO
+     */
     @GetMapping("/{id}")
     public ResponseEntity<FeedbackDTO> findById(@PathVariable Integer id) {
         return feedbackService.findById(id)
@@ -44,12 +53,25 @@ public class FeedbackController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Finds all feedbacks.
+     *
+     * @return a list of all feedback DTOs
+     */
     @GetMapping()
     public ResponseEntity<List<FeedbackDTO>> findAll() {
         return ResponseEntity.ok(feedbackService.findAll().stream()
                 .map(mapper::feedbackToFeedbackDto).toList());
     }
 
+    /**
+     * Updates an existing feedback.
+     *
+     * @param id the ID of the feedback to update
+     * @param feedbackDTO the feedback DTO with updated information
+     * @param auth the authentication object
+     * @return a response entity indicating the outcome
+     */
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody FeedbackDTO feedbackDTO, Authentication auth) {
@@ -67,7 +89,13 @@ public class FeedbackController {
         }
     }
 
-
+    /**
+     * Saves a new feedback.
+     *
+     * @param feedbackDTO the feedback DTO to save
+     * @param auth the authentication object
+     * @return a response entity indicating the outcome
+     */
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PostMapping()
     public ResponseEntity<Void> save(@RequestBody FeedbackDTO feedbackDTO, Authentication auth) {
@@ -77,16 +105,22 @@ public class FeedbackController {
         Feedback newFb = mapper.feedbackDtoToFeedback(feedbackDTO);
 
         try {
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(feedbackService.save(newFb)
-                        .getId()).toUri();
-        return ResponseEntity.created(location).build();
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(feedbackService.save(newFb)
+                            .getId()).toUri();
+            return ResponseEntity.created(location).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
+    /**
+     * Deletes a feedback by its ID.
+     *
+     * @param id the ID of the feedback to delete
+     * @return a response entity indicating the outcome
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable Integer id) {
@@ -95,6 +129,13 @@ public class FeedbackController {
                 : ResponseEntity.notFound().build();
     }
 
+    /**
+     * Checks if the authenticated user has access to the feedback.
+     *
+     * @param feedbackDTO the feedback DTO
+     * @param auth the authentication object
+     * @return true if the user has access, false otherwise
+     */
     private static Boolean hasUserAccess(FeedbackDTO feedbackDTO, Authentication auth) {
         User user = ((UserDetails) auth.getPrincipal()).getUser();
         return user.isAdmin() || user.getId().equals(feedbackDTO.getSenderId());

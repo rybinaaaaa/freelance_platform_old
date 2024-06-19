@@ -13,6 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service class for managing proposals.
+ */
 @Service
 @RequiredArgsConstructor
 public class ProposalService {
@@ -21,6 +24,12 @@ public class ProposalService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
 
+    /**
+     * Updates an existing proposal.
+     *
+     * @param proposal the proposal to update
+     * @return the updated proposal
+     */
     @Transactional
     public Proposal update(Proposal proposal) {
         return proposalRepository.findById(proposal.getId()).map(pr -> {
@@ -30,6 +39,12 @@ public class ProposalService {
         }).orElseThrow(() -> new NotFoundException("User with id " + proposal.getId() + " not found"));
     }
 
+    /**
+     * Saves a new proposal.
+     *
+     * @param proposal the proposal to save
+     * @return the saved proposal
+     */
     @Transactional
     public Proposal save(Proposal proposal) {
         Optional.ofNullable(proposal.getFreelancer()).flatMap(maybeFreelancer -> userRepository.findById(maybeFreelancer.getId()))
@@ -44,21 +59,44 @@ public class ProposalService {
         return proposalRepository.save(proposal);
     }
 
+    /**
+     * Finds a proposal by its ID.
+     *
+     * @param id the ID of the proposal
+     * @return an Optional containing the found proposal, or empty if not found
+     */
     @Transactional(readOnly = true)
     public Optional<Proposal> findById(Integer id) {
         return proposalRepository.findById(id);
     }
 
+    /**
+     * Finds all proposals.
+     *
+     * @return a list of all proposals
+     */
     @Transactional(readOnly = true)
     public List<Proposal> findAll() {
         return proposalRepository.findAll();
     }
 
+    /**
+     * Finds proposals by their freelancer.
+     *
+     * @param freelancer the freelancer of the proposals
+     * @return a list of proposals by the given freelancer
+     */
     @Transactional(readOnly = true)
     public List<Proposal> findByFreelancer(User freelancer) {
         return proposalRepository.findByFreelancer(freelancer);
     }
 
+    /**
+     * Deletes a proposal by its ID.
+     *
+     * @param id the ID of the proposal to delete
+     * @return true if the proposal was deleted, false otherwise
+     */
     @Transactional
     public boolean deleteById(Integer id) {
         return proposalRepository.findById(id)
