@@ -43,6 +43,7 @@ public class User extends AbstractEntity {
     private Role role;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Task> postedTasks = new ArrayList<>();
 
     @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
@@ -55,6 +56,7 @@ public class User extends AbstractEntity {
     private List<Feedback> sentFeedbacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Task> takenTasks = new ArrayList<>();
 
     public void addProposal(Proposal... proposals) {

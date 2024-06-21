@@ -1,10 +1,12 @@
 package freelanceplatform.services;
 
+import freelanceplatform.data.ProposalRepository;
 import freelanceplatform.data.ResumeRepository;
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.kafka.UserCreatedProducer;
+import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +24,15 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final ResumeRepository resumeRepository;
+    private final ProposalRepository proposalRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserCreatedProducer userCreatedProducer;
 
     @Autowired
-    public UserService(UserRepository userRepository, ResumeRepository resumeRepository, PasswordEncoder passwordEncoder, UserCreatedProducer userCreatedProducer) {
+    public UserService(UserRepository userRepository, ResumeRepository resumeRepository, ProposalRepository proposalRepository, PasswordEncoder passwordEncoder, UserCreatedProducer userCreatedProducer) {
         this.userRepository = userRepository;
         this.resumeRepository = resumeRepository;
+        this.proposalRepository = proposalRepository;
         this.passwordEncoder = passwordEncoder;
         this.userCreatedProducer = userCreatedProducer;
     }
@@ -58,6 +62,19 @@ public class UserService {
         Optional<User> userOptional = userRepository.getByUsername(username);
         if (userOptional.isEmpty()) throw new NotFoundException("User with username " + username + " not found");
         return userOptional.get();
+    }
+
+    /**
+     * Find a freelancer by proposal ID.
+     * @param  proposalId   the ID of the proposal to search
+     * @return              the freelancer associated with the proposal
+     */
+    @Transactional
+    public User findFreelancerByProposalId(Integer proposalId) {
+        Objects.requireNonNull(proposalId);
+        final Proposal proposal = proposalRepository.findById(proposalId)
+                .orElseThrow(() -> new NotFoundException("Proposal with id " + proposalId + " not found"));
+        return proposal.getFreelancer();
     }
 
     /**

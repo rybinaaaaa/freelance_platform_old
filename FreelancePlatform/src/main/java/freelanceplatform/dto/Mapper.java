@@ -124,7 +124,7 @@ public class Mapper {
      */
     public Task taskDTOToTask(TaskCreationDTO taskDTO) {
         Task task = new Task(
-//                taskDTO.getCustomer(),
+                taskDTO.getCustomer(),
                 taskDTO.getTitle(),
                 taskDTO.getProblem(),
                 taskDTO.getDeadline(),
