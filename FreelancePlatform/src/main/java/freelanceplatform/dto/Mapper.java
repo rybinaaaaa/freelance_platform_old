@@ -1,5 +1,7 @@
 package freelanceplatform.dto;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import freelanceplatform.dto.entityCreationDTO.TaskCreationDTO;
 import freelanceplatform.dto.entityCreationDTO.UserCreationDTO;
 import freelanceplatform.dto.entityDTO.*;
@@ -24,6 +26,7 @@ public class Mapper {
 
     private final UserService userService;
     private final TaskService taskService;
+    private final ObjectMapper objectMapper;
 
     /**
      * Converts a User entity to a UserDTO.
@@ -57,6 +60,15 @@ public class Mapper {
                 .password(userDTO.getPassword())
                 .role(userDTO.getRole())
                 .build();
+    }
+
+    public String convertUserToJson(User user) {
+        try {
+            return objectMapper.writeValueAsString(user);
+        } catch (JsonProcessingException e) {
+            // Логгирование или обработка исключения, если не удалось сериализовать в JSON
+            throw new RuntimeException("Error converting User to JSON", e);
+        }
     }
 
     /**

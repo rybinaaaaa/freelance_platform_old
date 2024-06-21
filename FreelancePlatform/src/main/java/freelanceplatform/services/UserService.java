@@ -1,13 +1,17 @@
 package freelanceplatform.services;
 
+import freelanceplatform.data.ProposalRepository;
 import freelanceplatform.data.ResumeRepository;
 import freelanceplatform.data.UserRepository;
+import freelanceplatform.dto.Mapper;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.kafka.UserCreatedProducer;
+import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,15 +26,20 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final ResumeRepository resumeRepository;
+    private final ProposalRepository proposalRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserCreatedProducer userCreatedProducer;
+    private final Mapper mapper;
 
     @Autowired
-    public UserService(UserRepository userRepository, ResumeRepository resumeRepository, PasswordEncoder passwordEncoder, UserCreatedProducer userCreatedProducer) {
+    public UserService(UserRepository userRepository, ResumeRepository resumeRepository, ProposalRepository proposalRepository,
+                       PasswordEncoder passwordEncoder, UserCreatedProducer userCreatedProducer, @Lazy Mapper mapper) {
         this.userRepository = userRepository;
         this.resumeRepository = resumeRepository;
+        this.proposalRepository = proposalRepository;
         this.passwordEncoder = passwordEncoder;
         this.userCreatedProducer = userCreatedProducer;
+        this.mapper = mapper;
     }
 
     /**
@@ -61,6 +70,19 @@ public class UserService {
     }
 
     /**
+     * Find a freelancer by proposal ID.
+     * @param  proposalId   the ID of the proposal to search
+     * @return              the freelancer associated with the proposal
+     */
+    @Transactional
+    public User findFreelancerByProposalId(Integer proposalId) {
+        Objects.requireNonNull(proposalId);
+        final Proposal proposal = proposalRepository.findById(proposalId)
+                .orElseThrow(() -> new NotFoundException("Proposal with id " + proposalId + " not found"));
+        return proposal.getFreelancer();
+    }
+
+    /**
      * Returns all users
      * @return all users
      */
@@ -81,7 +103,7 @@ public class UserService {
         }
         user.encodePassword(passwordEncoder);
         userRepository.save(user);
-        userCreatedProducer.sendMessage(String.format("User %s create", user.getUsername()));
+        userCreatedProducer.sendMessage(mapper.convertUserToJson(user));
     }
 
     /**
