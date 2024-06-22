@@ -121,12 +121,12 @@ public class TaskController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping(value = "/posted/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody TaskDTO updatedTaskDTO){
-        final Task task = taskService.getById(id);
-        task.setTitle(updatedTaskDTO.getTitle());
-        task.setProblem(updatedTaskDTO.getProblem());
-        task.setDeadline(updatedTaskDTO.getDeadline());
-        task.setType(updatedTaskDTO.getType());
         try {
+            final Task task = taskService.getById(id);
+            task.setTitle(updatedTaskDTO.getTitle());
+            task.setProblem(updatedTaskDTO.getProblem());
+            task.setDeadline(updatedTaskDTO.getDeadline());
+            task.setType(updatedTaskDTO.getType());
             taskService.update(task);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
@@ -139,8 +139,8 @@ public class TaskController {
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @DeleteMapping(value = "/posted/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
-        final Task task = taskService.getById(id);
         try {
+            final Task task = taskService.getById(id);
             taskService.delete(task);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
@@ -165,10 +165,8 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
-    //здесь путь не лежит через posted поскольку этот метод
-    // используется как для увольнения фрилансера так и для октаза от задачи
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PostMapping(value = "/{id}/")
+    @PostMapping(value = "/{id}")
     public ResponseEntity<Void> removeFreelancer(@PathVariable Integer id){
         final Task task = taskService.getById(id);
         taskService.removeFreelancer(task);

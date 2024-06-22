@@ -103,9 +103,9 @@ public class Mapper {
     public TaskDTO taskToTaskDTO(Task task) {
         TaskDTO taskDTO = new TaskDTO();
         taskDTO.setId(task.getId());
-        taskDTO.setCustomerName(task.getCustomer().getFirstName());
+        taskDTO.setCustomerUsername(task.getCustomer().getUsername());
         if (task.getFreelancer() != null) {
-            taskDTO.setFreelancerName(task.getFreelancer().getFirstName());
+            taskDTO.setFreelancerUsername(task.getFreelancer().getUsername());
         }
         taskDTO.setTitle(task.getTitle());
         taskDTO.setProblem(task.getProblem());
