@@ -62,11 +62,15 @@ public class Mapper {
                 .build();
     }
 
+    /**
+     * Converts user to json
+     * @param user to convert
+     * @return json string
+     */
     public String convertUserToJson(User user) {
         try {
             return objectMapper.writeValueAsString(user);
         } catch (JsonProcessingException e) {
-            // Логгирование или обработка исключения, если не удалось сериализовать в JSON
             throw new RuntimeException("Error converting User to JSON", e);
         }
     }
