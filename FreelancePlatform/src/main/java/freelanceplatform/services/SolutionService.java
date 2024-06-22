@@ -24,12 +24,24 @@ public class SolutionService {
         this.taskRepo = taskRepo;
     }
 
+    /**
+     * Saves a new solution.
+     *
+     * @param solution Solution object to be saved.
+     */
     @Transactional
     public void save(Solution solution){
         Objects.requireNonNull(solution);
         solutionRepo.save(solution);
     }
 
+    /**
+     * Retrieves a solution by its ID.
+     *
+     * @param id ID of the solution to retrieve.
+     * @return Solution object if found.
+     * @throws NotFoundException if the solution with the specified ID is not found.
+     */
     @Transactional(readOnly = true)
     public Solution getById(Integer id){
         Objects.requireNonNull(id);
@@ -38,6 +50,13 @@ public class SolutionService {
         return solution.get();
     }
 
+    /**
+     * Retrieves a solution associated with a specific task.
+     *
+     * @param task Task object to retrieve the associated solution.
+     * @return Solution object associated with the task.
+     * @throws NotFoundException if no solution is found for the specified task.
+     */
     public Solution getByTask(Task task){
         Objects.requireNonNull(task);
         Optional<Solution> solution = solutionRepo.findByTask(task);
@@ -45,11 +64,23 @@ public class SolutionService {
         return solution.get();
     }
 
+    /**
+     * Checks if a solution with the given ID exists.
+     *
+     * @param id ID of the solution to check.
+     * @return true if a solution with the specified ID exists; false otherwise.
+     */
     public boolean exists(Integer id){
         Objects.requireNonNull(id);
         return solutionRepo.existsById(id);
     }
 
+    /**
+     * Updates details of an existing solution.
+     *
+     * @param solution Updated Solution object.
+     * @throws NotFoundException if the solution to update is not found.
+     */
     @Transactional
     public void update(Solution solution){
         Objects.requireNonNull(solution);
@@ -60,6 +91,12 @@ public class SolutionService {
         }
     }
 
+    /**
+     * Deletes a solution.
+     *
+     * @param solution Solution object to delete.
+     * @throws NotFoundException if the solution to delete is not found.
+     */
     @Transactional
     public void delete(Solution solution){
         Objects.requireNonNull(solution);

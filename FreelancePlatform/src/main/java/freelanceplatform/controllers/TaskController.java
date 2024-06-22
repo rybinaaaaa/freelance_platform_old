@@ -33,20 +33,23 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
-    private final SolutionService solutionService;
-    private final ProposalService proposalService;
     private final UserService userService;
     private final Mapper mapper;
 
     @Autowired
-    public TaskController(TaskService taskService, SolutionService solutionService, ProposalService proposalService, UserService userService, Mapper mapper) {
+    public TaskController(TaskService taskService, UserService userService, Mapper mapper) {
         this.taskService = taskService;
-        this.solutionService = solutionService;
-        this.proposalService = proposalService;
         this.userService = userService;
         this.mapper = mapper;
     }
 
+    /**
+     * Saves a new task based on the provided TaskCreationDTO.
+     *
+     * @param taskDTO the TaskCreationDTO object containing the task details
+     * @param auth the Authentication object for the current user
+     * @return ResponseEntity with the URI of the newly created task
+     */
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> save(@RequestBody TaskCreationDTO taskDTO, Authentication auth){
@@ -60,6 +63,12 @@ public class TaskController {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Retrieves a task by its ID.
+     *
+     * @param id the ID of the task
+     * @return ResponseEntity with the task data or 404 if not found
+     */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TaskDTO> getById(@PathVariable Integer id){
         try {
@@ -70,7 +79,13 @@ public class TaskController {
         }
     }
 
-    //TASK BOARD
+    /**
+     * Retrieves all tasks based on specified filters.
+     *
+     * @param fromNewest Whether to sort tasks from newest to oldest.
+     * @param type       Optional parameter to filter tasks by type.
+     * @return ResponseEntity containing a list of TaskDTOs.
+     */
     @GetMapping(value = "/taskBoard", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Iterable<TaskDTO>> getAllTaskBoard(@RequestParam boolean fromNewest,
                                                              @RequestParam(required = false) TaskType type){
@@ -85,7 +100,14 @@ public class TaskController {
         return ResponseEntity.ok(taskDTOs);
     }
 
-    //TAKEN TASKS
+    /**
+     * Retrieves all tasks taken by the authenticated user based on status and expiration.
+     *
+     * @param taskStatus Optional parameter to filter tasks by status.
+     * @param expired    Whether to include expired tasks.
+     * @param auth       Authentication object containing user details.
+     * @return ResponseEntity containing a list of TaskDTOs.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping(value = "/taken", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Iterable<TaskDTO>> getAllTakenByTaskStatusAndExpiredStatus(@RequestParam(required = false) TaskStatus taskStatus,
@@ -102,7 +124,14 @@ public class TaskController {
         return ResponseEntity.ok(taskDTOs);
     }
 
-    //POSTED TASKS
+    /**
+     * Retrieves all tasks posted by the authenticated user based on status and expiration.
+     *
+     * @param taskStatus Optional parameter to filter tasks by status.
+     * @param expired    Whether to include expired tasks.
+     * @param auth       Authentication object containing user details.
+     * @return ResponseEntity containing a list of TaskDTOs.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping(value = "/posted", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Iterable<TaskDTO>> getAllPostedByTaskStatusAndExpiredStatus(@RequestParam(required = false) TaskStatus taskStatus, @RequestParam boolean expired, Authentication auth){
@@ -118,6 +147,13 @@ public class TaskController {
         return ResponseEntity.ok(taskDTOs);
     }
 
+    /**
+     * Updates details of a posted task.
+     *
+     * @param id            ID of the task to update.
+     * @param updatedTaskDTO Updated details of the task.
+     * @return ResponseEntity indicating success or failure of the update operation.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping(value = "/posted/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody TaskDTO updatedTaskDTO){
@@ -136,6 +172,12 @@ public class TaskController {
         }
     }
 
+    /**
+     * Deletes a posted task.
+     *
+     * @param id ID of the task to delete.
+     * @return ResponseEntity indicating success or failure of the delete operation.
+     */
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @DeleteMapping(value = "/posted/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
@@ -148,6 +190,13 @@ public class TaskController {
         }
     }
 
+    /**
+     * Assigns a freelancer to a posted task.
+     *
+     * @param id         ID of the task to assign a freelancer to.
+     * @param proposalId ID of the proposal from the freelancer.
+     * @return ResponseEntity indicating success or failure of the assignment operation.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/posted/{id}/proposals/{proposalId}")
     public ResponseEntity<Void> assignFreelancer(@PathVariable Integer id, @PathVariable Integer proposalId){
@@ -157,6 +206,12 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Accepts a proposal for a posted task.
+     *
+     * @param id ID of the task to accept a proposal for.
+     * @return ResponseEntity indicating success or failure of the acceptance operation.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/posted/{id}/accept")
     public ResponseEntity<Void> accept(@PathVariable Integer id){
@@ -165,6 +220,12 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Removes a freelancer from a posted task.
+     *
+     * @param id ID of the task to remove a freelancer from.
+     * @return ResponseEntity indicating success or failure of the removal operation.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}")
     public ResponseEntity<Void> removeFreelancer(@PathVariable Integer id){
@@ -173,6 +234,13 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Attaches a solution to a taken task.
+     *
+     * @param id       ID of the task to attach a solution to.
+     * @param solution Solution object containing the solution details.
+     * @return ResponseEntity indicating success or failure of the attachment operation.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/taken/{id}/attach-solution")
     public ResponseEntity<Void> attachSolution(@PathVariable Integer id, @RequestBody Solution solution){
@@ -181,6 +249,12 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Sends a taken task for review.
+     *
+     * @param id ID of the task to send for review.
+     * @return ResponseEntity indicating success or failure of sending the task for review.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/taken/{id}")
     public ResponseEntity<Void> sendOnReview(@PathVariable Integer id){

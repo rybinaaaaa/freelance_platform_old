@@ -25,6 +25,12 @@ public class SolutionController {
         this.solutionService = solutionService;
     }
 
+    /**
+     * Saves a new solution.
+     *
+     * @param solution Solution object to be saved.
+     * @return ResponseEntity indicating success and URI of the newly created resource.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> save(@RequestBody Solution solution){
@@ -35,6 +41,12 @@ public class SolutionController {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Retrieves a solution by its ID.
+     *
+     * @param id ID of the solution to retrieve.
+     * @return ResponseEntity containing the retrieved Solution object if found, or 404 if not found.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Solution> getById(@PathVariable Integer id){
@@ -45,6 +57,13 @@ public class SolutionController {
         }
     }
 
+    /**
+     * Updates details of an existing solution.
+     *
+     * @param id              ID of the solution to update.
+     * @param updatedSolution Updated details of the solution.
+     * @return ResponseEntity indicating success or failure of the update operation.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody Solution updatedSolution){
@@ -59,6 +78,12 @@ public class SolutionController {
         }
     }
 
+    /**
+     * Deletes a solution.
+     *
+     * @param id ID of the solution to delete.
+     * @return ResponseEntity indicating success or failure of the delete operation.
+     */
     @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> delete(@PathVariable Integer id){

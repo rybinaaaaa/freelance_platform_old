@@ -21,6 +21,15 @@ public class AuthenticationFailure implements AuthenticationFailureHandler {
         this.mapper = mapper;
     }
 
+    /**
+     * Called when authentication fails.
+     *
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @param exception the authentication exception
+     * @throws IOException in case of IO errors
+     * @throws ServletException in case of servlet errors
+     */
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         LOG.debug("Login failed for user {}.", request.getParameter("username"));

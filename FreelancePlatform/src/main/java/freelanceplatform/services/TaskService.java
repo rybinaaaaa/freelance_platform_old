@@ -34,6 +34,11 @@ public class TaskService {
         this.taskCreatedProducer = taskCreatedProducer;
     }
 
+    /**
+     * Saves a new task.
+     *
+     * @param task Task object to be saved.
+     */
     @Transactional
     public void save(Task task){
         Objects.requireNonNull(task);
@@ -41,12 +46,24 @@ public class TaskService {
         taskCreatedProducer.sendMessage(String.format("Task %s create", task.getTitle()));
     }
 
+    /**
+     * Saves a list of tasks.
+     *
+     * @param tasks List of Task objects to be saved.
+     */
     @Transactional
     public void saveAll(List<Task> tasks){
         Objects.requireNonNull(tasks);
         taskRepo.saveAll(tasks);
     }
 
+    /**
+     * Retrieves a task by its ID.
+     *
+     * @param id ID of the task to retrieve.
+     * @return Task object if found.
+     * @throws NotFoundException if the task with the specified ID is not found.
+     */
     @Transactional(readOnly = true)
     public Task getById(Integer id){
         Objects.requireNonNull(id);
@@ -55,8 +72,12 @@ public class TaskService {
         return task.get();
     }
 
-
-    //TASK BOARD
+    /**
+     * Retrieves all unassigned tasks sorted by posted date.
+     *
+     * @param fromNewest Whether to sort tasks from newest to oldest.
+     * @return Iterable of Task objects.
+     */
     @Transactional(readOnly = true)
     public Iterable<Task> getAllTaskBoardByPostedDate(boolean fromNewest){
         if (fromNewest) {
@@ -66,6 +87,13 @@ public class TaskService {
         }
     }
 
+    /**
+     * Retrieves all unassigned tasks of a specific type sorted by posted date.
+     *
+     * @param type       TaskType to filter tasks by.
+     * @param fromNewest Whether to sort tasks from newest to oldest.
+     * @return Iterable of Task objects.
+     */
     @Transactional(readOnly = true)
     public Iterable<Task> getAllTaskBoardByTypeAndPostedDate(TaskType type, boolean fromNewest) {
         if (fromNewest) {
@@ -75,7 +103,13 @@ public class TaskService {
         }
     }
 
-    //TAKEN TASKS
+    /**
+     * Retrieves all tasks taken by a user based on deadline status.
+     *
+     * @param userId ID of the user (freelancer) who took the tasks.
+     * @param expired Whether to include expired tasks.
+     * @return Iterable of Task objects.
+     */
     @Transactional(readOnly = true)
     public Iterable<Task> getAllTakenByUserIdAndDeadlineStatus(Integer userId, boolean expired){
         if (expired){
@@ -85,6 +119,14 @@ public class TaskService {
         }
     }
 
+    /**
+     * Retrieves all tasks taken by a user based on status and deadline status.
+     *
+     * @param userId     ID of the user (freelancer) who took the tasks.
+     * @param taskStatus TaskStatus to filter tasks by.
+     * @param expired    Whether to include expired tasks.
+     * @return Iterable of Task objects.
+     */
     @Transactional(readOnly = true)
     public Iterable<Task> getAllTakenByUserIdAndStatusAndDeadlineStatus(Integer userId, TaskStatus taskStatus, boolean expired){
         if (expired){
@@ -94,7 +136,13 @@ public class TaskService {
         }
     }
 
-    //POSTED TASKS
+    /**
+     * Retrieves all tasks posted by a user based on expiration status.
+     *
+     * @param userId  ID of the user (customer) who posted the tasks.
+     * @param expired Whether to include expired tasks.
+     * @return Iterable of Task objects.
+     */
     @Transactional(readOnly = true)
     public Iterable<Task> getAllPostedByUserIdAndExpiredStatus(Integer userId, boolean expired){
         if (expired){
@@ -104,6 +152,14 @@ public class TaskService {
         }
     }
 
+    /**
+     * Retrieves all tasks posted by a user based on status and expiration status.
+     *
+     * @param userId     ID of the user (customer) who posted the tasks.
+     * @param taskStatus TaskStatus to filter tasks by.
+     * @param expired    Whether to include expired tasks.
+     * @return Iterable of Task objects.
+     */
     @Transactional(readOnly = true)
     public Iterable<Task> getAllPostedByUserIdAndStatusAndExpiredStatus(Integer userId, TaskStatus taskStatus , boolean expired){
         if (expired){
@@ -113,12 +169,24 @@ public class TaskService {
         }
     }
 
-    //OTHER
+    /**
+     * Checks if a task with the given ID exists.
+     *
+     * @param id ID of the task to check.
+     * @return true if a task with the specified ID exists; false otherwise.
+     */
     public boolean exists(Integer id){
         Objects.requireNonNull(id);
         return taskRepo.existsById(id);
     }
 
+    /**
+     * Updates details of an existing task.
+     *
+     * @param task Updated Task object.
+     * @throws ValidationException if the task cannot be updated (e.g., not unassigned).
+     * @throws NotFoundException  if the task to update is not found.
+     */
     @Transactional
     public void update(Task task){
         Objects.requireNonNull(task);
@@ -131,6 +199,12 @@ public class TaskService {
         }
     }
 
+    /**
+     * Deletes a task.
+     *
+     * @param task Task object to delete.
+     * @throws NotFoundException if the task to delete is not found.
+     */
     @Transactional
     public void delete(Task task){
         Objects.requireNonNull(task);
@@ -145,6 +219,12 @@ public class TaskService {
         }
     }
 
+    /**
+     * Assigns a freelancer to a task.
+     *
+     * @param task      Task object to assign a freelancer to.
+     * @param freelancer User object representing the freelancer to assign.
+     */
     @Transactional
     public void assignFreelancer(Task task, User freelancer){
         Objects.requireNonNull(task);
@@ -157,6 +237,11 @@ public class TaskService {
         userRepo.save(freelancer);
     }
 
+    /**
+     * Accepts a solution for a task.
+     *
+     * @param task Task object to accept a solution for.
+     */
     @Transactional
     public void accept(Task task){
         Objects.requireNonNull(task);
@@ -164,14 +249,11 @@ public class TaskService {
         taskRepo.save(task);
     }
 
-    //todo должно быть реализовано в CorrectionService
-//    @Transactional
-//    public void returnWithCorrections(Task task){
-//        Objects.requireNonNull(task);
-//        task.setStatus(TaskStatus.ASSIGNED);
-//        taskRepo.save(task);
-//    }
-
+    /**
+     * Removes a freelancer from a task.
+     *
+     * @param task Task object to remove the freelancer from.
+     */
     //todo мейби добавить ограничения
     @Transactional
     public void removeFreelancer(Task task){
@@ -185,6 +267,12 @@ public class TaskService {
         taskRepo.save(task);
     }
 
+    /**
+     * Attaches a solution to a task.
+     *
+     * @param task     Task object to attach the solution to.
+     * @param solution Solution object to attach.
+     */
     @Transactional
     public void attachSolution(Task task, Solution solution){
         Objects.requireNonNull(task);
@@ -195,6 +283,11 @@ public class TaskService {
         solutionRepo.save(solution);
     }
 
+    /**
+     * Sends a task for review.
+     *
+     * @param task Task object to send for review.
+     */
     @Transactional
     public void senOnReview(Task task){
         task.setStatus(TaskStatus.SUBMITTED);

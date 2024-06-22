@@ -19,6 +19,13 @@ public class UserDetailsService implements org.springframework.security.core.use
         this.userRepo = userRepo;
     }
 
+    /**
+     * Loads a user by username.
+     *
+     * @param username the username of the user to load
+     * @return the UserDetails object for the specified username
+     * @throws UsernameNotFoundException if the user is not found
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final Optional<User> user = userRepo.getByUsername(username);
