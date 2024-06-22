@@ -8,8 +8,10 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.model.*;
 import freelanceplatform.security.model.UserDetails;
+import freelanceplatform.services.ProposalService;
 import freelanceplatform.services.SolutionService;
 import freelanceplatform.services.TaskService;
+import freelanceplatform.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -32,12 +34,16 @@ public class TaskController {
 
     private final TaskService taskService;
     private final SolutionService solutionService;
+    private final ProposalService proposalService;
+    private final UserService userService;
     private final Mapper mapper;
 
     @Autowired
-    public TaskController(TaskService taskService, SolutionService solutionService, Mapper mapper) {
+    public TaskController(TaskService taskService, SolutionService solutionService, ProposalService proposalService, UserService userService, Mapper mapper) {
         this.taskService = taskService;
         this.solutionService = solutionService;
+        this.proposalService = proposalService;
+        this.userService = userService;
         this.mapper = mapper;
     }
 
@@ -115,12 +121,12 @@ public class TaskController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping(value = "/posted/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody TaskDTO updatedTaskDTO){
-        final Task task = taskService.getById(id);
-        task.setTitle(updatedTaskDTO.getTitle());
-        task.setProblem(updatedTaskDTO.getProblem());
-        task.setDeadline(updatedTaskDTO.getDeadline());
-        task.setType(updatedTaskDTO.getType());
         try {
+            final Task task = taskService.getById(id);
+            task.setTitle(updatedTaskDTO.getTitle());
+            task.setProblem(updatedTaskDTO.getProblem());
+            task.setDeadline(updatedTaskDTO.getDeadline());
+            task.setType(updatedTaskDTO.getType());
             taskService.update(task);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
@@ -133,8 +139,8 @@ public class TaskController {
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @DeleteMapping(value = "/posted/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
-        final Task task = taskService.getById(id);
         try {
+            final Task task = taskService.getById(id);
             taskService.delete(task);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
@@ -146,9 +152,8 @@ public class TaskController {
     @PostMapping(value = "/posted/{id}/proposals/{proposalId}")
     public ResponseEntity<Void> assignFreelancer(@PathVariable Integer id, @PathVariable Integer proposalId){
         final Task task = taskService.getById(id);
-        //todo разкоментить когда будет готов proposalService
-//        final User freelancer = proposalService.getById(proposalId);
-//        taskService.assignFreelancer(task, freelancer);
+        final User freelancer = userService.findFreelancerByProposalId(proposalId);
+        taskService.assignFreelancer(task, freelancer);
         return ResponseEntity.noContent().build();
     }
 
@@ -160,10 +165,8 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
-    //здесь путь не лежит через posted поскольку этот метод
-    // используется как для уваольнения фрилансера так и для октаза от задачи
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PostMapping(value = "/{id}/")
+    @PostMapping(value = "/{id}")
     public ResponseEntity<Void> removeFreelancer(@PathVariable Integer id){
         final Task task = taskService.getById(id);
         taskService.removeFreelancer(task);

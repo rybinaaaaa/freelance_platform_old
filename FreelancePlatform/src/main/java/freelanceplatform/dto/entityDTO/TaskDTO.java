@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 public class TaskDTO {
 
     private Integer id;
-    private String customerName;
-    private String freelancerName;
+    private String customerUsername;
+    private String freelancerUsername;
     private String title;
     private String problem;
     private LocalDateTime deadline;

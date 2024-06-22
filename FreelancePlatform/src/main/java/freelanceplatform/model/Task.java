@@ -56,10 +56,8 @@ public class Task extends AbstractEntity {
     @JoinColumn(name = "solution_id")
     private Solution solution;
 
-    public Task(
-//            User customer,
-            String title, String problem, LocalDateTime deadline, Double payment, TaskType type) {
-//        this.customer = customer;
+    public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment, TaskType type) {
+        this.customer = customer;
         this.title = title;
         this.problem = problem;
         this.deadline = deadline;

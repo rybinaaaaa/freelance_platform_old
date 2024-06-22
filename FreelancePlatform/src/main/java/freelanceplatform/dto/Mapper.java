@@ -119,9 +119,9 @@ public class Mapper {
     public TaskDTO taskToTaskDTO(Task task) {
         TaskDTO taskDTO = new TaskDTO();
         taskDTO.setId(task.getId());
-        taskDTO.setCustomerName(task.getCustomer().getFirstName());
+        taskDTO.setCustomerUsername(task.getCustomer().getUsername());
         if (task.getFreelancer() != null) {
-            taskDTO.setFreelancerName(task.getFreelancer().getFirstName());
+            taskDTO.setFreelancerUsername(task.getFreelancer().getUsername());
         }
         taskDTO.setTitle(task.getTitle());
         taskDTO.setProblem(task.getProblem());
@@ -140,7 +140,7 @@ public class Mapper {
      */
     public Task taskDTOToTask(TaskCreationDTO taskDTO) {
         Task task = new Task(
-//                taskDTO.getCustomer(),
+                taskDTO.getCustomer(),
                 taskDTO.getTitle(),
                 taskDTO.getProblem(),
                 taskDTO.getDeadline(),

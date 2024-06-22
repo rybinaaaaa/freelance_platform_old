@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -38,6 +39,12 @@ public class TaskService {
         Objects.requireNonNull(task);
         taskRepo.save(task);
         taskCreatedProducer.sendMessage(String.format("Task %s create", task.getTitle()));
+    }
+
+    @Transactional
+    public void saveAll(List<Task> tasks){
+        Objects.requireNonNull(tasks);
+        taskRepo.saveAll(tasks);
     }
 
     @Transactional(readOnly = true)
@@ -116,7 +123,8 @@ public class TaskService {
     public void update(Task task){
         Objects.requireNonNull(task);
         if (exists(task.getId())) {
-            if (!task.getStatus().equals(TaskStatus.UNASSIGNED)) throw new ValidationException("Task can be updated only if it is unassigned");
+            if (!task.getStatus().equals(TaskStatus.UNASSIGNED))
+                throw new ValidationException("Task can be updated only if it is unassigned");
             taskRepo.save(task);
         } else {
             throw new NotFoundException("Task to update identified by " + task.getId() + " not found.");
