@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class Solution extends AbstractEntity{
 
-    @OneToOne(mappedBy = "solution", optional = false)
+    @OneToOne(mappedBy = "solution")
     private Task task;
 
     @Column
