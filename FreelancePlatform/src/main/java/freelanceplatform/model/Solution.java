@@ -16,11 +16,9 @@ public class Solution extends AbstractEntity{
     @OneToOne(mappedBy = "solution", optional = false)
     private Task task;
 
-    @Lob
     @Column
     private String description;
 
-    @Lob
     @Column(nullable = false)
     private String link;
 }

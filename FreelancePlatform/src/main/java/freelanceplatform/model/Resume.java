@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+
+import java.sql.Types;
 
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -16,8 +19,9 @@ public class Resume extends AbstractEntity{
     @Column(nullable = false)
     private String filename;
 
-    @Lob
     @Column
+//    or @JdbcType(VarbinaryJdbcType.class)
+    @JdbcTypeCode(Types.BINARY)
     private byte[] content;
 
     @OneToOne
