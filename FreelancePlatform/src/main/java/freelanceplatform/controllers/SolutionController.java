@@ -47,7 +47,6 @@ public class SolutionController {
      * @param id ID of the solution to retrieve.
      * @return ResponseEntity containing the retrieved Solution object if found, or 404 if not found.
      */
-    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Solution> getById(@PathVariable Integer id){
         try {
@@ -67,10 +66,10 @@ public class SolutionController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody Solution updatedSolution){
-        final Solution solution = solutionService.getById(id);
-        solution.setLink(updatedSolution.getLink());
-        solution.setDescription(updatedSolution.getDescription());
         try {
+            final Solution solution = solutionService.getById(id);
+            solution.setLink(updatedSolution.getLink());
+            solution.setDescription(updatedSolution.getDescription());
             solutionService.update(solution);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e){
@@ -85,10 +84,10 @@ public class SolutionController {
      * @return ResponseEntity indicating success or failure of the delete operation.
      */
     @PreAuthorize("hasRole('ROLE_USER')")
-    @DeleteMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
-        final Solution solution = solutionService.getById(id);
         try {
+            final Solution solution = solutionService.getById(id);
             solutionService.delete(solution);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {

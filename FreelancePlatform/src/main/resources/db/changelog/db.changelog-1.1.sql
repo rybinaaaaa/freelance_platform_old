@@ -21,4 +21,8 @@ INSERT INTO feedback (id, from_user_id, to_user_id, rating, comment)
 VALUES (1, (select id from users where email = 'user5@example.com'),
         (select id from users where email = 'user4@example.com'), 5, 'TEST'),
        (2, (select id from users where email = 'user7@example.com'),
-        (select id from users where email = 'user4@example.com'), 10, 'TEST')
+        (select id from users where email = 'user4@example.com'), 10, 'TEST');
+
+INSERT INTO solution (id, task_id, description, link)
+VALUES (1, 1, 'Translation completed as requested.', 'https://example.com/translation1'),
+       (2, 2, 'Translation in progress.', 'https://example.com/translation2');

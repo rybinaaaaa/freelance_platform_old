@@ -44,7 +44,6 @@ public class TaskControllerTest extends IntegrationTestBase {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
-    private final Mapper mapper;
     private final TaskService taskService;
     private final UserService userService;
 
@@ -53,10 +52,9 @@ public class TaskControllerTest extends IntegrationTestBase {
 
 
     @Autowired
-    public TaskControllerTest(MockMvc mockMvc, ObjectMapper objectMapper, Mapper mapper, TaskService taskService, UserService userService) {
+    public TaskControllerTest(MockMvc mockMvc, ObjectMapper objectMapper, TaskService taskService, UserService userService) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
-        this.mapper = mapper;
         this.taskService = taskService;
         this.userService = userService;
     }
@@ -264,6 +262,23 @@ public class TaskControllerTest extends IntegrationTestBase {
 
         mockMvc.perform(put("/rest/tasks/posted/1")
                         .with(user(new UserDetails(userAdmin)))
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(taskJson).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void updateByGuestReturnsStatusForbidden() throws Exception{
+        emptyUser.setRole(Role.GUEST);
+        Task task = taskService.getById(1);
+        task.setStatus(TaskStatus.UNASSIGNED);
+        taskService.save(task);
+        task.setTitle("New title");
+        TaskCreationDTO taskDTO= new TaskCreationDTO(task.getCustomer(), task.getTitle(), task.getProblem(), task.getDeadline(), task.getStatus(), task.getPayment(), task.getType());
+        String taskJson = objectMapper.writeValueAsString(taskDTO);
+
+        mockMvc.perform(put("/rest/tasks/posted/1")
+                        .with(user(new UserDetails(emptyUser)))
                         .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                         .content(taskJson).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
