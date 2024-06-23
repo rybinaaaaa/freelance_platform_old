@@ -32,8 +32,11 @@ public class SolutionService {
     @Transactional
     public void save(Solution solution){
         Objects.requireNonNull(solution);
+        Task task = solution.getTask();
+        Objects.requireNonNull(task);
         solutionRepo.save(solution);
     }
+
 
     /**
      * Retrieves a solution by its ID.

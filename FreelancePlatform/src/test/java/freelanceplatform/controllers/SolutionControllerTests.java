@@ -9,6 +9,7 @@ import freelanceplatform.model.Task;
 import freelanceplatform.model.User;
 import freelanceplatform.security.model.UserDetails;
 import freelanceplatform.services.SolutionService;
+import freelanceplatform.services.TaskService;
 import freelanceplatform.services.UserService;
 import freelanceplatform.utils.IntegrationTestBase;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,16 +31,19 @@ public class SolutionControllerTests extends IntegrationTestBase {
     private final ObjectMapper objectMapper;
     private final SolutionService solutionService;
     private final UserService userService;
+    private final TaskService taskService;
 
     private User userAdmin;
     private User emptyUser;
+    private Task task;
 
     @Autowired
-    public SolutionControllerTests(MockMvc mockMvc, ObjectMapper objectMapper, SolutionService solutionService, UserService userService) {
+    public SolutionControllerTests(MockMvc mockMvc, ObjectMapper objectMapper, SolutionService solutionService, UserService userService, TaskService taskService) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.solutionService = solutionService;
         this.userService = userService;
+        this.taskService = taskService;
     }
 
     @BeforeEach
@@ -51,11 +55,16 @@ public class SolutionControllerTests extends IntegrationTestBase {
         emptyUser = Generator.generateUser();
         emptyUser.setRole(Role.USER);
         userService.save(emptyUser);
+
+        task = Generator.generateTask();
+        task.setCustomer(emptyUser);
+        taskService.save(task);
     }
 
     @Test
     public void saveByUserReturnsStatusCreated() throws Exception{
         Solution solution = Generator.generateSolution();
+        solution.setTask(taskService.getById(1));
         String solutionJson = objectMapper.writeValueAsString(solution);
 
         mockMvc.perform(post("/rest/solutions")
@@ -180,6 +189,9 @@ public class SolutionControllerTests extends IntegrationTestBase {
 
     @Test
     public void deleteByUserReturnsStatusNoContent() throws Exception{
+        Solution solution = solutionService.getById(1);
+        solution.setTask(task);
+        solutionService.save(solution);
         mockMvc.perform(delete("/rest/solutions/1")
                         .with(user(new UserDetails(emptyUser))))
                 .andExpect(status().isNoContent());
