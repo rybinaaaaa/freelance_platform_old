@@ -8,7 +8,12 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.kafka.TaskCreatedProducer;
 import freelanceplatform.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +24,8 @@ import java.util.Optional;
 
 
 @Service
+@CacheConfig(cacheNames={"tasks"})
+@Slf4j
 public class TaskService {
 
     private final TaskRepository taskRepo;
@@ -65,7 +72,9 @@ public class TaskService {
      * @throws NotFoundException if the task with the specified ID is not found.
      */
     @Transactional(readOnly = true)
+    @Cacheable
     public Task getById(Integer id){
+        log.info("Get task by id {}.", id);
         Objects.requireNonNull(id);
         Optional<Task> task = taskRepo.findById(id);
         if (task.isEmpty()) throw new NotFoundException("Task identified by " + id + " not found.");
@@ -188,6 +197,7 @@ public class TaskService {
      * @throws NotFoundException  if the task to update is not found.
      */
     @Transactional
+    @CachePut(key = "#task.id")
     public void update(Task task){
         Objects.requireNonNull(task);
         if (exists(task.getId())) {
@@ -206,6 +216,7 @@ public class TaskService {
      * @throws NotFoundException if the task to delete is not found.
      */
     @Transactional
+    @CacheEvict(key = "#task.id")
     public void delete(Task task){
         Objects.requireNonNull(task);
         if (exists(task.getId())) {
@@ -226,6 +237,7 @@ public class TaskService {
      * @param freelancer User object representing the freelancer to assign.
      */
     @Transactional
+    @CachePut(key = "#task.id")
     public void assignFreelancer(Task task, User freelancer){
         Objects.requireNonNull(task);
         Objects.requireNonNull(freelancer);
@@ -243,6 +255,7 @@ public class TaskService {
      * @param task Task object to accept a solution for.
      */
     @Transactional
+    @CachePut(key = "#task.id")
     public void accept(Task task){
         Objects.requireNonNull(task);
         task.setStatus(TaskStatus.ACCEPTED);
@@ -256,6 +269,7 @@ public class TaskService {
      */
     //todo мейби добавить ограничения
     @Transactional
+    @CachePut(key = "#task.id")
     public void removeFreelancer(Task task){
         Objects.requireNonNull(task);
         task.getFreelancer().removeTakenTask(task);
@@ -274,6 +288,7 @@ public class TaskService {
      * @param solution Solution object to attach.
      */
     @Transactional
+    @CachePut(key = "#task.id")
     public void attachSolution(Task task, Solution solution){
         Objects.requireNonNull(task);
         Objects.requireNonNull(solution);
@@ -289,6 +304,7 @@ public class TaskService {
      * @param task Task object to send for review.
      */
     @Transactional
+    @CachePut(key = "#task.id")
     public void senOnReview(Task task){
         task.setStatus(TaskStatus.SUBMITTED);
         task.setSubmittedDate(LocalDateTime.now());
