@@ -10,7 +10,9 @@ import freelanceplatform.kafka.UserCreatedProducer;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import java.util.Optional;
 /**
  * The User service
  */
+@Slf4j
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -48,8 +51,9 @@ public class UserService {
      * @return user
      */
     @Transactional
-//    @Cacheable(value = "users", key = "#id")
+    @Cacheable(value = "users", key = "#id")
     public User find(Integer id) {
+        log.info("getById was called");
         Objects.requireNonNull(id);
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) throw new NotFoundException("User with id " + id + " not found");

@@ -83,11 +83,26 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>com.hazelcast</groupId>-->
+<!--            <artifactId>hazelcast-spring</artifactId>-->
+<!--            <version>${hazelcast.version}</version>-->
+<!--        </dependency>-->
+
+        <!-- Caching   -->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework</groupId>-->
+<!--            <artifactId>spring-context</artifactId>-->
+<!--            <version>6.0.13</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast-spring</artifactId>
-            <version>${hazelcast.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+            <version>3.1.5</version>
         </dependency>
+
+
     </dependencies>
     <build>
         <plugins>

@@ -8,7 +8,9 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.kafka.TaskCreatedProducer;
 import freelanceplatform.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-
+@Slf4j
 @Service
 public class TaskService {
 
@@ -65,7 +67,9 @@ public class TaskService {
      * @throws NotFoundException if the task with the specified ID is not found.
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "tasks", key = "#id")
     public Task getById(Integer id){
+        log.info("getById was called");
         Objects.requireNonNull(id);
         Optional<Task> task = taskRepo.findById(id);
         if (task.isEmpty()) throw new NotFoundException("Task identified by " + id + " not found.");
