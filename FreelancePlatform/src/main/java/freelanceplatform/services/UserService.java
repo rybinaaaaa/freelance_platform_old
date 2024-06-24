@@ -10,6 +10,7 @@ import freelanceplatform.kafka.UserCreatedProducer;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
@@ -27,6 +28,7 @@ import java.util.Optional;
  */
 @Service
 @CacheConfig(cacheNames={"users"})
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
     private final ResumeRepository resumeRepository;
@@ -57,6 +59,7 @@ public class UserService {
         Objects.requireNonNull(id);
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) throw new NotFoundException("User with id " + id + " not found");
+        log.info("User with id {} has been added to cache", id);
         return userOptional.get();
     }
 

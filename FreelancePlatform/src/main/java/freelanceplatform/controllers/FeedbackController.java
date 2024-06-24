@@ -1,6 +1,7 @@
 package freelanceplatform.controllers;
 
 import freelanceplatform.dto.Mapper;
+import freelanceplatform.dto.entityCreationDTO.FeedbackCreationDTO;
 import freelanceplatform.dto.entityDTO.FeedbackDTO;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Feedback;
@@ -14,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 /**
@@ -38,6 +39,7 @@ public class FeedbackController {
     private final Mapper mapper;
 
     private final static ResponseEntity<Void> FORBIDDEN1 = new ResponseEntity<>(FORBIDDEN);
+    private final static ResponseEntity<Void> BAD_REQUEST = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
     /**
      * Finds a feedback by its ID.
@@ -76,8 +78,8 @@ public class FeedbackController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody FeedbackDTO feedbackDTO, Authentication auth) {
         Objects.requireNonNull(feedbackDTO);
-        feedbackDTO.setId(id);
 
+        if (!feedbackDTO.getId().equals(id)) return BAD_REQUEST;
         if (!hasUserAccess(feedbackDTO, auth)) return FORBIDDEN1;
 
         Feedback newFb = mapper.feedbackDtoToFeedback(feedbackDTO);
@@ -92,17 +94,17 @@ public class FeedbackController {
     /**
      * Saves a new feedback.
      *
-     * @param feedbackDTO the feedback DTO to save
+     * @param feedbackCreationDTO the feedback DTO to save
      * @param auth the authentication object
      * @return a response entity indicating the outcome
      */
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PostMapping()
-    public ResponseEntity<Void> save(@RequestBody FeedbackDTO feedbackDTO, Authentication auth) {
-        Objects.requireNonNull(feedbackDTO);
-        if (!hasUserAccess(feedbackDTO, auth)) return FORBIDDEN1;
+    public ResponseEntity<Void> save(@RequestBody FeedbackCreationDTO feedbackCreationDTO, Authentication auth) {
+        Objects.requireNonNull(feedbackCreationDTO);
+        if (!hasUserAccess(feedbackCreationDTO, auth)) return FORBIDDEN1;
 
-        Feedback newFb = mapper.feedbackDtoToFeedback(feedbackDTO);
+        Feedback newFb = mapper.feedbackCreationDtoToFeedback(feedbackCreationDTO);
 
         try {
             URI location = ServletUriComponentsBuilder
@@ -111,7 +113,7 @@ public class FeedbackController {
                             .getId()).toUri();
             return ResponseEntity.created(location).build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -139,5 +141,17 @@ public class FeedbackController {
     private static Boolean hasUserAccess(FeedbackDTO feedbackDTO, Authentication auth) {
         User user = ((UserDetails) auth.getPrincipal()).getUser();
         return user.isAdmin() || user.getId().equals(feedbackDTO.getSenderId());
+    }
+
+    /**
+     * Checks if the authenticated user has access to the feedback.
+     *
+     * @param feedbackCreationDTO the feedbackCreation DTO
+     * @param auth the authentication object
+     * @return true if the user has access, false otherwise
+     */
+    private static Boolean hasUserAccess(FeedbackCreationDTO feedbackCreationDTO, Authentication auth) {
+        User user = ((UserDetails) auth.getPrincipal()).getUser();
+        return user.isAdmin() || user.getId().equals(feedbackCreationDTO.getSenderId());
     }
 }

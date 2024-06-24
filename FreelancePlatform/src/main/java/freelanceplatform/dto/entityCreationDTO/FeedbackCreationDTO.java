@@ -1,11 +1,10 @@
-package freelanceplatform.dto.entityDTO;
+package freelanceplatform.dto.entityCreationDTO;
 
 import lombok.Value;
 
 @Value
-public class FeedbackDTO {
+public class FeedbackCreationDTO {
 
-    Integer id;
     Integer senderId;
     Integer receiverId;
     Integer rating;

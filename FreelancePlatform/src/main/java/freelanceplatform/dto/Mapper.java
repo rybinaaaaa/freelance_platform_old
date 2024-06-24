@@ -2,6 +2,8 @@ package freelanceplatform.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import freelanceplatform.dto.entityCreationDTO.FeedbackCreationDTO;
+import freelanceplatform.dto.entityCreationDTO.ProposalCreationDTO;
 import freelanceplatform.dto.entityCreationDTO.TaskCreationDTO;
 import freelanceplatform.dto.entityCreationDTO.UserCreationDTO;
 import freelanceplatform.dto.entityDTO.*;
@@ -178,6 +180,31 @@ public class Mapper {
     }
 
     /**
+     * Converts a FeedbackCreationDTO to a Feedback entity.
+     *
+     * @param fb the FeedbackCreationDTO to convert
+     * @return the converted Feedback entity
+     */
+    public Feedback feedbackCreationDtoToFeedback(FeedbackCreationDTO fb) {
+        Feedback feedback = new Feedback();
+        feedback.setRating(fb.getRating());
+        feedback.setComment(fb.getComment());
+
+        User receiver = Optional.ofNullable(fb.getReceiverId())
+                .map(userService::find)
+                .orElse(null);
+
+        User sender = Optional.ofNullable(fb.getSenderId())
+                .map(userService::find)
+                .orElse(null);
+
+        feedback.setReceiver(receiver);
+        feedback.setSender(sender);
+
+        return feedback;
+    }
+
+    /**
      * Converts a Feedback entity to a FeedbackDTO.
      *
      * @param fb the Feedback entity to convert
@@ -190,6 +217,23 @@ public class Mapper {
                 fb.getReceiver().getId(),
                 fb.getRating(),
                 fb.getComment()
+        );
+    }
+
+    /**
+     * Converts a ProposalCreationDTO to a Proposal entity.
+     *
+     * @param proposalCreationDTO the ProposalCreationDTO to convert
+     * @return the converted Proposal entity
+     */
+    public Proposal proposalCreationDTOToProposal(ProposalCreationDTO proposalCreationDTO) {
+        return new Proposal(
+                Optional.ofNullable(proposalCreationDTO.getFreelancerId())
+                        .map(userService::find)
+                        .orElse(null),
+                Optional.ofNullable(proposalCreationDTO.getTaskId())
+                        .map(taskService::getById)
+                        .orElse(null)
         );
     }
 }

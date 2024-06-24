@@ -1,6 +1,7 @@
 package freelanceplatform.controllers;
 
 import freelanceplatform.dto.Mapper;
+import freelanceplatform.dto.entityCreationDTO.ProposalCreationDTO;
 import freelanceplatform.dto.entityDTO.ProposalDTO;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Proposal;
@@ -35,6 +36,7 @@ public class ProposalController {
     private final Mapper mapper;
 
     private final static ResponseEntity<Void> FORBIDDEN1 = new ResponseEntity<>(FORBIDDEN);
+    private final static ResponseEntity<Void> BAD_REQUEST = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
     /**
      * Finds a proposal by its ID.
@@ -72,8 +74,8 @@ public class ProposalController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody ProposalDTO proposalDTO, Authentication auth) {
         Objects.requireNonNull(proposalDTO);
-        proposalDTO.setId(id);
 
+        if (!proposalDTO.getId().equals(id)) return BAD_REQUEST;
         if (!hasUserAccess(proposalDTO, auth)) return FORBIDDEN1;
 
         Proposal newPr = mapper.proposalDTOToProposal(proposalDTO);
@@ -88,18 +90,18 @@ public class ProposalController {
     /**
      * Saves a new proposal.
      *
-     * @param proposalDTO the proposal DTO to save
-     * @param auth the authentication object
+     * @param proposalCreationDTO the proposal DTO to save
+     * @param auth                the authentication object
      * @return a response entity indicating the outcome
      */
     @PreAuthorize("hasAnyRole({'ROLE_USER', 'ROLE_ADMIN'})")
     @PostMapping()
-    public ResponseEntity<Void> save(@RequestBody ProposalDTO proposalDTO, Authentication auth) {
-        Objects.requireNonNull(proposalDTO);
+    public ResponseEntity<Void> save(@RequestBody ProposalCreationDTO proposalCreationDTO, Authentication auth) {
+        Objects.requireNonNull(proposalCreationDTO);
 
-        if (!hasUserAccess(proposalDTO, auth)) return FORBIDDEN1;
+        if (!hasUserAccess(proposalCreationDTO, auth)) return FORBIDDEN1;
 
-        Proposal newPr = mapper.proposalDTOToProposal(proposalDTO);
+        Proposal newPr = mapper.proposalCreationDTOToProposal(proposalCreationDTO);
         try {
             URI location = ServletUriComponentsBuilder
                     .fromCurrentRequest().path("/{id}")
@@ -134,5 +136,17 @@ public class ProposalController {
     private static Boolean hasUserAccess(ProposalDTO proposalDTO, Authentication auth) {
         User user = ((UserDetails) auth.getPrincipal()).getUser();
         return user.isAdmin() || user.getId().equals(proposalDTO.getFreelancerId());
+    }
+
+    /**
+     * Checks if the authenticated user has access to the proposal.
+     *
+     * @param proposalCreationDTO the proposal DTO
+     * @param auth the authentication object
+     * @return true if the user has access, false otherwise
+     */
+    private static Boolean hasUserAccess(ProposalCreationDTO proposalCreationDTO, Authentication auth) {
+        User user = ((UserDetails) auth.getPrincipal()).getUser();
+        return user.isAdmin() || user.getId().equals(proposalCreationDTO.getFreelancerId());
     }
 }

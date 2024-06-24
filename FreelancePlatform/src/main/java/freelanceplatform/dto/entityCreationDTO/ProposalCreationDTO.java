@@ -4,11 +4,12 @@ import freelanceplatform.model.Task;
 import freelanceplatform.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
+@Value
 public class ProposalCreationDTO {
 
-    private final User freelancer;
-    private final Task task;
+    Integer freelancerId;
+    Integer taskId;
 }
+

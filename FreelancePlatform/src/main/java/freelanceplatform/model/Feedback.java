@@ -13,14 +13,14 @@ import lombok.*;
 public class Feedback extends AbstractEntity {
 
     @ManyToOne
-    @JoinColumn(name = "from_user_id", nullable = false)
+    @JoinColumn(name = "from_user_id")
     private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "to_user_id", nullable = false)
+    @JoinColumn(name = "to_user_id")
     private User receiver;
 
-    @Column(nullable = false)
+    @Column
     private Integer rating;
 
     @Column

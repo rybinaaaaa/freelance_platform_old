@@ -8,12 +8,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-
+import java.io.Serializable;
 
 
 @MappedSuperclass
 @Data
-public abstract class AbstractEntity {
+public abstract class AbstractEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

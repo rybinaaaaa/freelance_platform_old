@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Builder
-public class User extends AbstractEntity implements Serializable {
+public class User extends AbstractEntity {
 
     @Column(nullable = false, unique = true)
     private String username;

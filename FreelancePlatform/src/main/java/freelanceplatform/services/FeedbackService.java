@@ -6,6 +6,7 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Feedback;
 import freelanceplatform.model.User;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +35,12 @@ public class FeedbackService {
             fb.getReceiver().deleteReceivedFeedback(fb);
             fb.getSender().deleteSentFeedback(fb);
 
-            Optional.ofNullable(newFb.getReceiver()).ifPresent(receiver -> receiver.addReceivedFeedback(newFb));
-            Optional.ofNullable(newFb.getSender()).ifPresent(sender -> sender.addSentFeedback(newFb));
+            Optional.ofNullable(newFb.getReceiver()).ifPresent(receiver -> {
+                receiver.addReceivedFeedback(newFb);
+            });
+            Optional.ofNullable(newFb.getSender()).ifPresent(sender -> {
+                sender.addSentFeedback(newFb);
+            });
 
             return feedbackRepository.save(fb);
         }).orElseThrow(() -> new NotFoundException("Feedback with id " + newFb.getId() + " not found."));

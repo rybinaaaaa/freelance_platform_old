@@ -17,7 +17,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @Transactional
 @EnableAspectJAutoProxy
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class IntegrationTestBase {
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
             "postgres:16-alpine"

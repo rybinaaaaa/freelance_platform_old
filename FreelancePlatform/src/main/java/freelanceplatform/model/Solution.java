@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Solution extends AbstractEntity{
+public class Solution extends AbstractEntity {
 
     @OneToOne(mappedBy = "solution")
     private Task task;
