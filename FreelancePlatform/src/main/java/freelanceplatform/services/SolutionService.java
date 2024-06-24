@@ -6,6 +6,10 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Solution;
 import freelanceplatform.model.Task;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@CacheConfig(cacheNames={"solutions"})
 public class SolutionService {
 
     private final SolutionRepository solutionRepo;
@@ -46,6 +51,7 @@ public class SolutionService {
      * @throws NotFoundException if the solution with the specified ID is not found.
      */
     @Transactional(readOnly = true)
+    @Cacheable
     public Solution getById(Integer id){
         Objects.requireNonNull(id);
         Optional<Solution> solution = solutionRepo.findById(id);
@@ -60,6 +66,8 @@ public class SolutionService {
      * @return Solution object associated with the task.
      * @throws NotFoundException if no solution is found for the specified task.
      */
+    @Transactional(readOnly = true)
+    @Cacheable
     public Solution getByTask(Task task){
         Objects.requireNonNull(task);
         Optional<Solution> solution = solutionRepo.findByTask(task);
@@ -85,6 +93,7 @@ public class SolutionService {
      * @throws NotFoundException if the solution to update is not found.
      */
     @Transactional
+    @CachePut(key = "#solution.id")
     public void update(Solution solution){
         Objects.requireNonNull(solution);
         if (exists(solution.getId())){
@@ -101,6 +110,7 @@ public class SolutionService {
      * @throws NotFoundException if the solution to delete is not found.
      */
     @Transactional
+    @CacheEvict(key = "#solution.id")
     public void delete(Solution solution){
         Objects.requireNonNull(solution);
         if (exists(solution.getId())){
