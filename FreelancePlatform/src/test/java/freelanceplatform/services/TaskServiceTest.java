@@ -11,6 +11,7 @@ import freelanceplatform.model.TaskStatus;
 import freelanceplatform.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Transactional
@@ -45,6 +47,19 @@ public class TaskServiceTest {
         userRepo.save(task.getCustomer());
         userRepo.save(freelancer);
         taskRepo.save(task);
+    }
+
+
+    @Test
+    public void testCaching() {
+        // First call - should fetch from method
+        Integer idFirstCall = taskService.getById(task.getId()).getId();
+
+        // Second call - should fetch from cache
+        Integer idSecondCall = taskService.getById(task.getId()).getId();
+
+        // Verify method invocation on mock object
+        verify(taskService, times(1)).getById(task.getId()); // Ensure method was called only once
     }
 
     @Test
