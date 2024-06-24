@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Builder
-public class User extends AbstractEntity {
+public class User extends AbstractEntity implements Serializable {
 
     @Column(nullable = false, unique = true)
     private String username;

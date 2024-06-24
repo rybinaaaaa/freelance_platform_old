@@ -11,6 +11,9 @@ import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ import java.util.Optional;
  * The User service
  */
 @Service
+@CacheConfig(cacheNames={"users"})
 public class UserService {
     private final UserRepository userRepository;
     private final ResumeRepository resumeRepository;
@@ -48,7 +52,7 @@ public class UserService {
      * @return user
      */
     @Transactional
-//    @Cacheable(value = "users", key = "#id")
+    @Cacheable
     public User find(Integer id) {
         Objects.requireNonNull(id);
         Optional<User> userOptional = userRepository.findById(id);
@@ -112,7 +116,7 @@ public class UserService {
      * @return updated user
      */
     @Transactional
-//    @CachePut(value = "users", key = "#id")
+    @CachePut(key = "#user.id")
     public User update(User user){
         Objects.requireNonNull(user);
         if (exists(user.getId())) {
