@@ -61,6 +61,7 @@ public class SolutionControllerTests extends IntegrationTestBase {
         taskService.save(task);
     }
 
+    //todo resolve insertion problem
     @Test
     public void saveByUserReturnsStatusCreated() throws Exception{
         Solution solution = Generator.generateSolution();
@@ -74,6 +75,7 @@ public class SolutionControllerTests extends IntegrationTestBase {
                 .andExpect(status().isCreated());
     }
 
+    //todo resolve insertion problem
     @Test
     public void saveByAdminReturnsStatusForbidden() throws Exception{
         Solution solution = Generator.generateSolution();
@@ -86,6 +88,7 @@ public class SolutionControllerTests extends IntegrationTestBase {
                 .andExpect(status().isForbidden());
     }
 
+    //todo resolve insertion problem
     @Test
     public void saveByGuestReturnsStatusForbidden() throws Exception{
         emptyUser.setRole(Role.GUEST);
@@ -128,6 +131,10 @@ public class SolutionControllerTests extends IntegrationTestBase {
     @Test
     public void updateByUserReturnsStatusNoContent() throws Exception{
         Solution solution = solutionService.getById(1);
+        solution.setTask(task);
+        task.setSolution(solution);
+        taskService.save(task);
+        solutionService.save(solution);
         solution.setDescription("new description");
         String solutionJson = objectMapper.writeValueAsString(solution);
 
