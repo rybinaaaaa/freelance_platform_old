@@ -22,10 +22,4 @@ public class Proposal extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
-
-    public Proposal(Integer id, User freelancer, Task task) {
-        setId(id);
-        this.freelancer = freelancer;
-        this.task = task;
-    }
 }
