@@ -6,7 +6,11 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Feedback;
 import freelanceplatform.model.User;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,10 +22,12 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = {"feedbacks"})
+@Slf4j
 public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     /**
      * Updates an existing feedback.
@@ -30,18 +36,12 @@ public class FeedbackService {
      * @return the updated feedback
      */
     @Transactional
+    @CachePut(key = "#newFb.id")
     public Feedback update(Feedback newFb) {
+        log.info("Updating feedback with id {}", newFb.getId());
         return feedbackRepository.findById(newFb.getId()).map(fb -> {
-            fb.getReceiver().deleteReceivedFeedback(fb);
-            fb.getSender().deleteSentFeedback(fb);
-
-            Optional.ofNullable(newFb.getReceiver()).ifPresent(receiver -> {
-                receiver.addReceivedFeedback(newFb);
-            });
-            Optional.ofNullable(newFb.getSender()).ifPresent(sender -> {
-                sender.addSentFeedback(newFb);
-            });
-
+            fb.setComment(newFb.getComment());
+            fb.setRating(newFb.getRating());
             return feedbackRepository.save(fb);
         }).orElseThrow(() -> new NotFoundException("Feedback with id " + newFb.getId() + " not found."));
     }
@@ -53,12 +53,14 @@ public class FeedbackService {
      * @return the saved feedback
      */
     @Transactional
+    @CachePut(key = "#feedback.id")
     public Feedback save(Feedback feedback) {
+        log.info("Saving new feedback with id {}", feedback.getId());
         Optional.ofNullable(feedback.getReceiver())
-                .flatMap(maybeReceiver -> this.getUser(maybeReceiver.getId()))
+                .flatMap(maybeReceiver -> Optional.of(userService.find(maybeReceiver.getId())))
                 .ifPresent(user -> user.addReceivedFeedback(feedback));
         Optional.ofNullable(feedback.getSender())
-                .flatMap(maybeSender -> this.getUser(maybeSender.getId()))
+                .flatMap(maybeSender -> Optional.of(userService.find(maybeSender.getId())))
                 .ifPresent(user -> user.addSentFeedback(feedback));
         return feedbackRepository.save(feedback);
     }
@@ -70,7 +72,9 @@ public class FeedbackService {
      * @return an Optional containing the found feedback, or empty if not found
      */
     @Transactional(readOnly = true)
+    @Cacheable
     public Optional<Feedback> findById(Integer id) {
+        log.info("Finding feedback by id {}", id);
         return feedbackRepository.findById(id);
     }
 
@@ -81,6 +85,7 @@ public class FeedbackService {
      */
     @Transactional(readOnly = true)
     public List<Feedback> findAll() {
+        log.info("Finding all feedbacks");
         return feedbackRepository.findAll();
     }
 
@@ -91,7 +96,9 @@ public class FeedbackService {
      * @return true if the feedback was deleted, false otherwise
      */
     @Transactional
+    @CacheEvict
     public boolean deleteById(Integer id) {
+        log.info("Deleting feedback with id {}", id);
         return feedbackRepository.findById(id)
                 .map(feedback -> {
                     User sender = feedback.getSender();
@@ -116,6 +123,7 @@ public class FeedbackService {
      */
     @Transactional(readOnly = true)
     public List<Feedback> findByReceiver(User receiver) {
+        log.info("Finding feedbacks by receiver {}", receiver.getUsername());
         return feedbackRepository.findByReceiver(receiver);
     }
 
@@ -127,17 +135,7 @@ public class FeedbackService {
      */
     @Transactional(readOnly = true)
     public List<Feedback> findBySender(User sender) {
+        log.info("Finding feedbacks by sender {}", sender.getUsername());
         return feedbackRepository.findBySender(sender);
-    }
-
-    /**
-     * Finds a user by their ID.
-     *
-     * @param id the ID of the user
-     * @return an Optional containing the found user, or empty if not found
-     */
-    @Transactional(readOnly = true)
-    protected Optional<User> getUser(Integer id) {
-        return Optional.ofNullable(id).flatMap(userRepository::findById);
     }
 }

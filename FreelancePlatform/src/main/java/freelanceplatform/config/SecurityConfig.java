@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -68,6 +69,7 @@ public class SecurityConfig {
         final AuthenticationSuccess authSuccess = authenticationSuccess();
         // Allow through everything, it will be dealt with using security annotations on methods
         http.authorizeHttpRequests((auth) -> auth.anyRequest().permitAll())
+                .httpBasic(Customizer.withDefaults())
                 // Return 401 by default when attempting to access a secured endpoint
                 .exceptionHandling(ehc -> ehc.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
 

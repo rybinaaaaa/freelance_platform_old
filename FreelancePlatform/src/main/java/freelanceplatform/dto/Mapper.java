@@ -101,15 +101,19 @@ public class Mapper {
      * @return the converted Proposal entity
      */
     public Proposal proposalDTOToProposal(ProposalDTO proposalDTO) {
-        return new Proposal(
-                proposalDTO.getId(),
+        Proposal proposal = new Proposal();
+        proposal.setId(proposalDTO.getId());
+        proposal.setFreelancer(
                 Optional.ofNullable(proposalDTO.getFreelancerId())
-                        .map(userService::find)
-                        .orElse(null),
+                .map(userService::find)
+                .orElse(null));
+        proposal.setTask(
                 Optional.ofNullable(proposalDTO.getTaskId())
                         .map(taskService::getById)
                         .orElse(null)
         );
+
+        return proposal;
     }
 
     /**

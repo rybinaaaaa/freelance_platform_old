@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @EqualsAndHashCode(callSuper = true)
-@ToString(exclude = {"receivedFeedbacks", "sentFeedbacks", "proposals", "takenTasks"})
+@ToString(exclude = {"receivedFeedbacks", "sentFeedbacks", "proposals", "takenTasks", "postedTasks"})
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
