@@ -1,5 +1,6 @@
 package freelanceplatform.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -54,6 +55,7 @@ public class Task extends AbstractEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "solution_id")
+    @JsonIgnore
     private Solution solution;
 
     public Task(User customer, String title, String problem, LocalDateTime deadline, Double payment, TaskType type) {

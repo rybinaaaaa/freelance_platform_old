@@ -2,12 +2,17 @@ package freelanceplatform.controllers;
 
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Solution;
+import freelanceplatform.model.Task;
+import freelanceplatform.model.User;
+import freelanceplatform.security.model.UserDetails;
 import freelanceplatform.services.SolutionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
@@ -65,9 +70,11 @@ public class SolutionController {
      */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody Solution updatedSolution){
+    public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody Solution updatedSolution, Authentication auth){
         try {
             final Solution solution = solutionService.getById(id);
+            if (!hasAccess(solution, auth))
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             solution.setLink(updatedSolution.getLink());
             solution.setDescription(updatedSolution.getDescription());
             solutionService.update(solution);
@@ -85,13 +92,19 @@ public class SolutionController {
      */
     @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id){
+    public ResponseEntity<Void> delete(@PathVariable Integer id, Authentication auth){
         try {
             final Solution solution = solutionService.getById(id);
+            if (!hasAccess(solution, auth)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             solutionService.delete(solution);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    private boolean hasAccess(Solution solution, Authentication auth) {
+        final User user = ((UserDetails) auth.getPrincipal()).getUser();
+        return solution.getTask().getFreelancer().equals(user);
     }
 }

@@ -14,6 +14,7 @@ import freelanceplatform.services.TaskService;
 import freelanceplatform.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +25,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 
 @Slf4j
@@ -156,9 +159,10 @@ public class TaskController {
      */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping(value = "/posted/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody TaskDTO updatedTaskDTO){
+    public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody TaskDTO updatedTaskDTO, Authentication auth){
         try {
             final Task task = taskService.getById(id);
+            if (!hasAccess(task, auth)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             task.setTitle(updatedTaskDTO.getTitle());
             task.setProblem(updatedTaskDTO.getProblem());
             task.setDeadline(updatedTaskDTO.getDeadline());
@@ -180,9 +184,10 @@ public class TaskController {
      */
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @DeleteMapping(value = "/posted/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id){
+    public ResponseEntity<Void> delete(@PathVariable Integer id, Authentication auth){
         try {
             final Task task = taskService.getById(id);
+            if (!hasAccess(task, auth)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             taskService.delete(task);
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
@@ -199,8 +204,9 @@ public class TaskController {
      */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/posted/{id}/proposals/{proposalId}")
-    public ResponseEntity<Void> assignFreelancer(@PathVariable Integer id, @PathVariable Integer proposalId){
+    public ResponseEntity<Void> assignFreelancer(@PathVariable Integer id, @PathVariable Integer proposalId, Authentication auth){
         final Task task = taskService.getById(id);
+        if (!hasAccess(task, auth)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         final User freelancer = userService.findFreelancerByProposalId(proposalId);
         taskService.assignFreelancer(task, freelancer);
         return ResponseEntity.noContent().build();
@@ -214,8 +220,9 @@ public class TaskController {
      */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/posted/{id}/accept")
-    public ResponseEntity<Void> accept(@PathVariable Integer id){
+    public ResponseEntity<Void> accept(@PathVariable Integer id, Authentication auth){
         final Task task = taskService.getById(id);
+        if (!hasAccess(task, auth)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         taskService.accept(task);
         return ResponseEntity.noContent().build();
     }
@@ -228,8 +235,9 @@ public class TaskController {
      */
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping(value = "/{id}")
-    public ResponseEntity<Void> removeFreelancer(@PathVariable Integer id){
+    public ResponseEntity<Void> removeFreelancer(@PathVariable Integer id, Authentication auth){
         final Task task = taskService.getById(id);
+        if (!hasAccess(task, auth)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         taskService.removeFreelancer(task);
         return ResponseEntity.noContent().build();
     }
@@ -260,5 +268,10 @@ public class TaskController {
     public ResponseEntity<Void> sendOnReview(@PathVariable Integer id){
         taskService.senOnReview(taskService.getById(id));
         return ResponseEntity.noContent().build();
+    }
+
+    private boolean hasAccess(Task task, Authentication auth) {
+        final User user = ((UserDetails) auth.getPrincipal()).getUser();
+        return task.getCustomer().equals(user);
     }
 }
