@@ -221,9 +221,11 @@ public class TaskService {
         Objects.requireNonNull(task);
         if (exists(task.getId())) {
             task.getCustomer().removePostedTask(task);
-            if (task.getFreelancer()!=null) task.getFreelancer().removeTakenTask(task);
+            if (task.getFreelancer()!=null) {
+                task.getFreelancer().removeTakenTask(task);
+                userRepo.save(task.getFreelancer());
+            }
             userRepo.save(task.getCustomer());
-            userRepo.save(task.getFreelancer());
             taskRepo.delete(task);
         } else {
             throw new NotFoundException("Task to delete identified by " + task.getId() + " not found.");
