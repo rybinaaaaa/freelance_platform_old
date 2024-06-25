@@ -32,15 +32,8 @@ public class FeedbackService {
     @Transactional
     public Feedback update(Feedback newFb) {
         return feedbackRepository.findById(newFb.getId()).map(fb -> {
-            fb.getReceiver().deleteReceivedFeedback(fb);
-            fb.getSender().deleteSentFeedback(fb);
-
-            Optional.ofNullable(newFb.getReceiver()).ifPresent(receiver -> {
-                receiver.addReceivedFeedback(newFb);
-            });
-            Optional.ofNullable(newFb.getSender()).ifPresent(sender -> {
-                sender.addSentFeedback(newFb);
-            });
+            fb.setComment(newFb.getComment());
+            fb.setRating(newFb.getRating());
 
             return feedbackRepository.save(fb);
         }).orElseThrow(() -> new NotFoundException("Feedback with id " + newFb.getId() + " not found."));

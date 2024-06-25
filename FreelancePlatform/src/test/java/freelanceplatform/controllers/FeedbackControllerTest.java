@@ -11,6 +11,7 @@ import freelanceplatform.security.model.UserDetails;
 import freelanceplatform.services.FeedbackService;
 import freelanceplatform.services.UserService;
 import freelanceplatform.utils.IntegrationTestBase;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,16 +80,37 @@ class FeedbackControllerTest extends IntegrationTestBase {
     @Test
     void updateByAdminReturnsStatusNoContent() throws Exception {
         Feedback feedback = feedbackService.findById(1).orElseThrow(() -> new NotFoundException("Incorrect id in tests!"));
-        feedback.setComment("test");
+        String comment = "test1";
+        feedback.setComment(comment);
 
 
         String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
 
         mockMvc.perform(put("/rest/feedbacks/1")
-                        .with(user(new UserDetails(userAdmin)))
+                        .with(user(new UserDetails(feedback.getSender())))
                         .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                         .content(fb).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+
+        Assertions.assertEquals(feedbackService.findById(1).get().getComment(), comment);
+    }
+
+    @Test
+    void updateByUserReturnsStatusNoContent() throws Exception {
+        Feedback feedback = feedbackService.findById(1).orElseThrow(() -> new NotFoundException("Incorrect id in tests!"));
+        String comment = "test2";
+        feedback.setComment(comment);
+
+
+        String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
+
+        mockMvc.perform(put("/rest/feedbacks/1")
+                        .with(user(new UserDetails(feedback.getSender())))
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(fb).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        Assertions.assertEquals(feedbackService.findById(1).get().getComment(), comment);
     }
 
     @Test
@@ -104,21 +126,6 @@ class FeedbackControllerTest extends IntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                         .content(fb).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void updateByUserReturnsStatusNoContent() throws Exception {
-        Feedback feedback = feedbackService.findById(1).orElseThrow(() -> new NotFoundException("Incorrect id in tests!"));
-        feedback.setComment("test");
-
-
-        String fb = objectMapper.writeValueAsString(mapper.feedbackToFeedbackDto(feedback));
-
-        mockMvc.perform(put("/rest/feedbacks/1")
-                        .with(user(new UserDetails(feedback.getSender())))
-                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
-                        .content(fb).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
     }
 
     @Test

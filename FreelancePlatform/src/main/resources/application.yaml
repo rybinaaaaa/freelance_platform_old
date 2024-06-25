@@ -3,8 +3,6 @@ spring:
     name: FreelancePlatform
   jpa:
     hibernate:
-#      ddl-auto: update
-#      ddl-auto: create-drop
       ddl-auto: validate
     show-sql: true
   datasource:

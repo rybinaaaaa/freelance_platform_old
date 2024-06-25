@@ -15,7 +15,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest
 @Transactional
-@EnableAspectJAutoProxy
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class IntegrationTestBase {

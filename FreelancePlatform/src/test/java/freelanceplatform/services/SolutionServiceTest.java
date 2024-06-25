@@ -9,18 +9,19 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Role;
 import freelanceplatform.model.Solution;
 import freelanceplatform.model.Task;
+import freelanceplatform.utils.IntegrationTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
-@Transactional
-public class SolutionServiceTest {
+@ActiveProfiles("services")
+public class SolutionServiceTest extends IntegrationTestBase {
 
     @Autowired
     private SolutionService solutionService;
