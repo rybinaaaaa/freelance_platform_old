@@ -7,6 +7,11 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +23,8 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
+@CacheConfig(cacheNames = "proposals")
 public class ProposalService {
 
     private final ProposalRepository proposalRepository;
@@ -31,12 +38,14 @@ public class ProposalService {
      * @return the updated proposal
      */
     @Transactional
+    @CachePut(key = "#proposal.id")
     public Proposal update(Proposal proposal) {
+        log.info("Updating proposal with id {}", proposal.getId());
         return proposalRepository.findById(proposal.getId()).map(pr -> {
             Optional.ofNullable(pr.getFreelancer()).ifPresent(fr -> fr.deleteProposal(pr));
             Optional.ofNullable(proposal.getFreelancer()).ifPresent(fr -> fr.addProposal(pr));
             return proposalRepository.save(proposal);
-        }).orElseThrow(() -> new NotFoundException("User with id " + proposal.getId() + " not found"));
+        }).orElseThrow(() -> new NotFoundException("Proposal with id " + proposal.getId() + " not found"));
     }
 
     /**
@@ -46,14 +55,16 @@ public class ProposalService {
      * @return the saved proposal
      */
     @Transactional
+    @CachePut(key = "#proposal.id")
     public Proposal save(Proposal proposal) {
+        log.info("Saving new proposal with id {}", proposal.getId());
         Optional.ofNullable(proposal.getFreelancer()).flatMap(maybeFreelancer -> userRepository.findById(maybeFreelancer.getId()))
                 .ifPresent(freelancer1 -> freelancer1.addProposal(proposal));
         Optional.ofNullable(proposal.getTask()).ifPresent(
                 maybeTask -> {
                     Optional.ofNullable(maybeTask.getId())
                             .flatMap(taskRepository::findById)
-                            .orElseThrow(() -> new NotFoundException("User with id " + proposal.getId() + " not found"));
+                            .orElseThrow(() -> new NotFoundException("Task with id " + maybeTask.getId() + " not found"));
                 }
         );
         return proposalRepository.save(proposal);
@@ -66,7 +77,9 @@ public class ProposalService {
      * @return an Optional containing the found proposal, or empty if not found
      */
     @Transactional(readOnly = true)
+    @Cacheable
     public Optional<Proposal> findById(Integer id) {
+        log.info("Finding proposal by id {}", id);
         return proposalRepository.findById(id);
     }
 
@@ -77,6 +90,7 @@ public class ProposalService {
      */
     @Transactional(readOnly = true)
     public List<Proposal> findAll() {
+        log.info("Finding all proposals");
         return proposalRepository.findAll();
     }
 
@@ -88,6 +102,7 @@ public class ProposalService {
      */
     @Transactional(readOnly = true)
     public List<Proposal> findByFreelancer(User freelancer) {
+        log.info("Finding proposals by freelancer {}", freelancer.getUsername());
         return proposalRepository.findByFreelancer(freelancer);
     }
 
@@ -98,7 +113,9 @@ public class ProposalService {
      * @return true if the proposal was deleted, false otherwise
      */
     @Transactional
+    @CacheEvict
     public boolean deleteById(Integer id) {
+        log.info("Deleting proposal with id {}", id);
         return proposalRepository.findById(id)
                 .map(proposal -> {
                     proposalRepository.delete(proposal);
