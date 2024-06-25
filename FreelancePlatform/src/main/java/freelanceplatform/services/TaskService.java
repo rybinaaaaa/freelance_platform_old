@@ -46,6 +46,7 @@ public class TaskService {
      *
      * @param task Task object to be saved.
      */
+    @CachePut(key = "#task.id")
     @Transactional
     public void save(Task task){
         Objects.requireNonNull(task);
