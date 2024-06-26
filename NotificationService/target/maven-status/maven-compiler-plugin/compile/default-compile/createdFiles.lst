@@ -1,0 +1,14 @@
+notificationService/model/User.class
+notificationService/model/Role.class
+notificationService/model/Correction.class
+notificationService/model/TaskStatus.class
+notificationService/model/Solution.class
+notificationService/model/Resume.class
+notificationService/NotificationServiceApplication.class
+notificationService/KafkaConsumer.class
+notificationService/model/TaskType.class
+notificationService/model/Task.class
+notificationService/model/Proposal.class
+notificationService/model/User$UserBuilder.class
+notificationService/model/AbstractEntity.class
+notificationService/model/Feedback.class
