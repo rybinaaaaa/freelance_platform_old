@@ -13,6 +13,7 @@ import freelanceplatform.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
@@ -136,6 +137,7 @@ public class UserService {
      * @param user
      */
     @Transactional
+    @CacheEvict(key = "#user.id")
     public void delete(User user){
         Objects.requireNonNull(user);
         if (exists(user.getId())) {
