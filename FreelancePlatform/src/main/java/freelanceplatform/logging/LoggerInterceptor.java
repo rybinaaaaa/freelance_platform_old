@@ -30,7 +30,7 @@ public class LoggerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        log.info("[preHandle][" + request + "]" + "[" + request.getMethod() + "]"
+        log.info("[preHandle][" + request.getMethod() + "]"
                 + "[" + request.getRequestURI() + "]" + "[" + getParameters(request) + "]");
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }

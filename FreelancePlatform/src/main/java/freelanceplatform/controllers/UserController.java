@@ -106,7 +106,8 @@ public class UserController {
      * @param userCreationDTO the user creation data transfer object
      * @return the ResponseEntity indicating the result of the operation
      */
-    @PreAuthorize("(!#userCreationDTO.isAdmin() && anonymous) || hasRole('ROLE_ADMIN')")
+//    @PreAuthorize("(!#userCreationDTO.isAdmin() && anonymous) || hasRole('ROLE_ADMIN')")
+    @PreAuthorize("!#userCreationDTO.isAdmin()")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> signUp(@RequestBody UserCreationDTO userCreationDTO) {
         User user = mapper.userDTOToUser(userCreationDTO);
