@@ -3,11 +3,11 @@ package freelanceplatform.kafka.topics;
 
 public enum TaskChangesTopic {
 
-    TaskPosted("Task was posted"),
-    FreelancerAssigned("Freelancer was assigned"),
-    TaskAccepted("Task was accepted"),
-    FreelancerRemoved("Freelancer was removed"),
-    TaskSendOnReview("Task was send on review");
+    TaskPosted("task_posted"),
+    FreelancerAssigned("freelancer_assigned"),
+    TaskAccepted("task_accepted"),
+    FreelancerRemoved("freelancer_removed"),
+    TaskSendOnReview("task_send_on_review");
 
     private final String value;
 

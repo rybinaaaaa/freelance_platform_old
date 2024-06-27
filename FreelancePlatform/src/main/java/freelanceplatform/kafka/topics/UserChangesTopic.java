@@ -2,9 +2,9 @@ package freelanceplatform.kafka.topics;
 
 public enum UserChangesTopic {
 
-    UserCreated("User was created"),
-    UserUpdated("User was updated"),
-    UserDeleted("User was deleted");
+    UserCreated("user_created"),
+    UserUpdated("user_updated"),
+    UserDeleted("user_deleted");
 
     private final String value;
 
