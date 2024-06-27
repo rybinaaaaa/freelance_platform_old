@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaskCreatedProducer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserCreatedProducer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserKafkaProducer.class);
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public TaskCreatedProducer(KafkaTemplate<String, String> kafkaTemplate) {
