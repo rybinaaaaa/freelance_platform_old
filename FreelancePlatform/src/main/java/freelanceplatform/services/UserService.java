@@ -6,7 +6,7 @@ import freelanceplatform.data.UserRepository;
 import freelanceplatform.dto.Mapper;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
-import freelanceplatform.kafka.UserKafkaProducer;
+import freelanceplatform.kafka.UserChangesProducer;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 
+import static freelanceplatform.kafka.topics.UserChangesTopic.UserCreated;
+
 /**
  * The User service
  */
@@ -35,18 +37,17 @@ public class UserService {
     private final ResumeRepository resumeRepository;
     private final ProposalRepository proposalRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserKafkaProducer userKafkaProducer;
+    private final UserChangesProducer userChangesProducer;
     private final Mapper mapper;
-    private final String USER_CREATED_TOPIC = "user_created";
 
     @Autowired
     public UserService(UserRepository userRepository, ResumeRepository resumeRepository, ProposalRepository proposalRepository,
-                       PasswordEncoder passwordEncoder, UserKafkaProducer userKafkaProducer, @Lazy Mapper mapper) {
+                       PasswordEncoder passwordEncoder, UserChangesProducer userChangesProducer, @Lazy Mapper mapper) {
         this.userRepository = userRepository;
         this.resumeRepository = resumeRepository;
         this.proposalRepository = proposalRepository;
         this.passwordEncoder = passwordEncoder;
-        this.userKafkaProducer = userKafkaProducer;
+        this.userChangesProducer = userChangesProducer;
         this.mapper = mapper;
     }
 
@@ -112,7 +113,8 @@ public class UserService {
         }
         user.encodePassword(passwordEncoder);
         userRepository.save(user);
-        userKafkaProducer.sendMessage(USER_CREATED_TOPIC, mapper.convertUserToJson(user));
+//        userChangesProducer.sendMessage(USER_CREATED_TOPIC, mapper.convertUserToJson(user));
+        userChangesProducer.sendMessage(mapper.convertUserToJson(user), UserCreated);
     }
 
     /**
