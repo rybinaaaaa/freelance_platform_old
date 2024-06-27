@@ -6,7 +6,7 @@ import freelanceplatform.data.TaskRepository;
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
-import freelanceplatform.kafka.TaskChangesProducer;
+import freelanceplatform.kafka.ChangesProducer;
 import freelanceplatform.kafka.topics.TaskChangesTopic;
 import freelanceplatform.model.*;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +34,10 @@ public class TaskService {
     private final TaskRepository taskRepo;
     private final UserRepository userRepo;
     private final SolutionRepository solutionRepo;
-    private final TaskChangesProducer taskChangesProducer;
+    private final ChangesProducer<TaskChangesTopic> taskChangesProducer;
 
     @Autowired
-    public TaskService(TaskRepository taskRepo, UserRepository userRepo, SolutionRepository solutionRepo, TaskChangesProducer taskChangesProducer) {
+    public TaskService(TaskRepository taskRepo, UserRepository userRepo, SolutionRepository solutionRepo, ChangesProducer<TaskChangesTopic> taskChangesProducer) {
         this.taskRepo = taskRepo;
         this.userRepo = userRepo;
         this.solutionRepo = solutionRepo;
