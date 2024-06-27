@@ -39,7 +39,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserChangesProducer userChangesProducer;
     private final Mapper mapper;
-//    private final String USER_CREATED_TOPIC = "user_created";
 
     @Autowired
     public UserService(UserRepository userRepository, ResumeRepository resumeRepository, ProposalRepository proposalRepository,
