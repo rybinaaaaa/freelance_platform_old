@@ -6,7 +6,8 @@ import freelanceplatform.data.TaskRepository;
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
-import freelanceplatform.kafka.TaskCreatedProducer;
+import freelanceplatform.kafka.TaskChangesProducer;
+import freelanceplatform.kafka.topics.TaskChangesTopic;
 import freelanceplatform.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static freelanceplatform.kafka.topics.TaskChangesTopic.TaskPosted;
+
 
 @Service
 @CacheConfig(cacheNames={"tasks"})
@@ -31,14 +34,14 @@ public class TaskService {
     private final TaskRepository taskRepo;
     private final UserRepository userRepo;
     private final SolutionRepository solutionRepo;
-    private final TaskCreatedProducer taskCreatedProducer;
+    private final TaskChangesProducer taskChangesProducer;
 
     @Autowired
-    public TaskService(TaskRepository taskRepo, UserRepository userRepo, SolutionRepository solutionRepo, TaskCreatedProducer taskCreatedProducer) {
+    public TaskService(TaskRepository taskRepo, UserRepository userRepo, SolutionRepository solutionRepo, TaskChangesProducer taskChangesProducer) {
         this.taskRepo = taskRepo;
         this.userRepo = userRepo;
         this.solutionRepo = solutionRepo;
-        this.taskCreatedProducer = taskCreatedProducer;
+        this.taskChangesProducer = taskChangesProducer;
     }
 
     /**
@@ -46,11 +49,12 @@ public class TaskService {
      *
      * @param task Task object to be saved.
      */
+    @CachePut(key = "#task.id")
     @Transactional
     public void save(Task task){
         Objects.requireNonNull(task);
         taskRepo.save(task);
-        taskCreatedProducer.sendMessage(String.format("Task %s create", task.getTitle()));
+        taskChangesProducer.sendMessage(String.format("Task %s create", task.getTitle()), TaskPosted);
     }
 
     /**
@@ -221,9 +225,11 @@ public class TaskService {
         Objects.requireNonNull(task);
         if (exists(task.getId())) {
             task.getCustomer().removePostedTask(task);
-            if (task.getFreelancer()!=null) task.getFreelancer().removeTakenTask(task);
+            if (task.getFreelancer()!=null) {
+                task.getFreelancer().removeTakenTask(task);
+                userRepo.save(task.getFreelancer());
+            }
             userRepo.save(task.getCustomer());
-            userRepo.save(task.getFreelancer());
             taskRepo.delete(task);
         } else {
             throw new NotFoundException("Task to delete identified by " + task.getId() + " not found.");

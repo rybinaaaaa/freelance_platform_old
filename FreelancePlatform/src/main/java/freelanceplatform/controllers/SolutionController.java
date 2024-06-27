@@ -105,6 +105,6 @@ public class SolutionController {
 
     private boolean hasAccess(Solution solution, Authentication auth) {
         final User user = ((UserDetails) auth.getPrincipal()).getUser();
-        return solution.getTask().getFreelancer().equals(user);
+        return solution.getTask().getFreelancer().getId().equals(user.getId());
     }
 }

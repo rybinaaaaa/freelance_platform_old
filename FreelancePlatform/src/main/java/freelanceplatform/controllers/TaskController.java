@@ -162,7 +162,8 @@ public class TaskController {
     public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody TaskDTO updatedTaskDTO, Authentication auth){
         try {
             final Task task = taskService.getById(id);
-            if (!hasAccess(task, auth)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            if (!hasAccess(task, auth))
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             task.setTitle(updatedTaskDTO.getTitle());
             task.setProblem(updatedTaskDTO.getProblem());
             task.setDeadline(updatedTaskDTO.getDeadline());
@@ -234,7 +235,7 @@ public class TaskController {
      * @return ResponseEntity indicating success or failure of the removal operation.
      */
     @PreAuthorize("hasRole('ROLE_USER')")
-    @PostMapping(value = "/{id}")
+    @PostMapping(value = "/{id}/remove-freelancer")
     public ResponseEntity<Void> removeFreelancer(@PathVariable Integer id, Authentication auth){
         final Task task = taskService.getById(id);
         if (!hasAccess(task, auth)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -272,6 +273,6 @@ public class TaskController {
 
     private boolean hasAccess(Task task, Authentication auth) {
         final User user = ((UserDetails) auth.getPrincipal()).getUser();
-        return task.getCustomer().equals(user);
+        return task.getCustomer().getId().equals(user.getId());
     }
 }
