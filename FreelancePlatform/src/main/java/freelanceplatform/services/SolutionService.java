@@ -34,6 +34,7 @@ public class SolutionService {
      *
      * @param solution Solution object to be saved.
      */
+    @CachePut(key = "#solution.id")
     @Transactional
     public void save(Solution solution){
         Objects.requireNonNull(solution);

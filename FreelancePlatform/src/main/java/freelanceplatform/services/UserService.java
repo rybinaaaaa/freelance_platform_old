@@ -6,6 +6,8 @@ import freelanceplatform.data.UserRepository;
 import freelanceplatform.dto.Mapper;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
+import freelanceplatform.kafka.UserCreatedProducer;
+import freelanceplatform.kafka.topics.UserChangesTopic;
 import freelanceplatform.kafka.UserKafkaProducer;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Resume;
@@ -23,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Optional;
+
+import static freelanceplatform.kafka.topics.UserChangesTopic.UserCreated;
 
 /**
  * The User service
@@ -113,6 +117,7 @@ public class UserService {
         user.encodePassword(passwordEncoder);
         userRepository.save(user);
         userKafkaProducer.sendMessage(USER_CREATED_TOPIC, mapper.convertUserToJson(user));
+        userCreatedProducer.sendMessage(mapper.convertUserToJson(user), UserCreated);
     }
 
     /**

@@ -24,7 +24,7 @@ public class KafkaConfig {
      */
     @Bean
     public NewTopic taskCreatedTopic() {
-        return TopicBuilder.name("task_created")
+        return TopicBuilder.name("task_posted")
                 .build();
     }
 }
