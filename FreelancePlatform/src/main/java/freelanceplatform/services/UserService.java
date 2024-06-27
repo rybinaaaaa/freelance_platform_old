@@ -6,8 +6,7 @@ import freelanceplatform.data.UserRepository;
 import freelanceplatform.dto.Mapper;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
-import freelanceplatform.kafka.UserCreatedProducer;
-import freelanceplatform.kafka.topics.UserChangesTopic;
+import freelanceplatform.kafka.UserChangesProducer;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
@@ -38,17 +37,17 @@ public class UserService {
     private final ResumeRepository resumeRepository;
     private final ProposalRepository proposalRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserCreatedProducer userCreatedProducer;
+    private final UserChangesProducer userChangesProducer;
     private final Mapper mapper;
 
     @Autowired
     public UserService(UserRepository userRepository, ResumeRepository resumeRepository, ProposalRepository proposalRepository,
-                       PasswordEncoder passwordEncoder, UserCreatedProducer userCreatedProducer, @Lazy Mapper mapper) {
+                       PasswordEncoder passwordEncoder, UserChangesProducer userChangesProducer, @Lazy Mapper mapper) {
         this.userRepository = userRepository;
         this.resumeRepository = resumeRepository;
         this.proposalRepository = proposalRepository;
         this.passwordEncoder = passwordEncoder;
-        this.userCreatedProducer = userCreatedProducer;
+        this.userChangesProducer = userChangesProducer;
         this.mapper = mapper;
     }
 
@@ -114,7 +113,7 @@ public class UserService {
         }
         user.encodePassword(passwordEncoder);
         userRepository.save(user);
-        userCreatedProducer.sendMessage(mapper.convertUserToJson(user), UserCreated);
+        userChangesProducer.sendMessage(mapper.convertUserToJson(user), UserCreated);
     }
 
     /**

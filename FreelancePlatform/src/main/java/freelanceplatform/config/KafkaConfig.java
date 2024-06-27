@@ -1,18 +1,12 @@
 package freelanceplatform.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import java.util.HashMap;
-import java.util.Map;
+import static freelanceplatform.kafka.topics.TaskChangesTopic.*;
+import static freelanceplatform.kafka.topics.UserChangesTopic.UserCreated;
 
 @Configuration
 public class KafkaConfig {
@@ -51,7 +45,7 @@ public class KafkaConfig {
      */
     @Bean
     public NewTopic userCreatedTopic() {
-        return TopicBuilder.name("user_created")
+        return TopicBuilder.name(UserCreated.name())
                 .build();
     }
 
@@ -60,8 +54,32 @@ public class KafkaConfig {
      * @return
      */
     @Bean
-    public NewTopic taskCreatedTopic() {
-        return TopicBuilder.name("task_posted")
+    public NewTopic taskPostedTopic() {
+        return TopicBuilder.name(TaskPosted.name())
+                .build();
+    }
+
+    @Bean
+    public NewTopic freelancerAssignedTopic(){
+        return TopicBuilder.name(FreelancerAssigned.name())
+                .build();
+    }
+
+    @Bean
+    public NewTopic TaskAcceptedTopic(){
+        return TopicBuilder.name(TaskAccepted.name())
+                .build();
+    }
+
+    @Bean
+    public NewTopic freelancerRemovedTopic(){
+        return TopicBuilder.name(FreelancerRemoved.name())
+                .build();
+    }
+
+    @Bean
+    public NewTopic taskSendOnReviewTopic(){
+        return TopicBuilder.name(TaskSendOnReview.name())
                 .build();
     }
 }
