@@ -1,21 +1,21 @@
 package notificationService.consumers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+@Slf4j
 @Service
-public class UserConsumer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserConsumer.class);
+public class UserChangesConsumer {
+
     private final ObjectMapper mapper;
 
     @Autowired
-    public UserConsumer(ObjectMapper mapper) {
+    public UserChangesConsumer(ObjectMapper mapper) {
         this.mapper = mapper;
     }
 
@@ -23,7 +23,7 @@ public class UserConsumer {
             topics = "user_created",
             groupId = "myGroup"
     )
-    public void consumeUser(String message) {
+    public void consumeUserChange(String message) {
         try {
             Map<String, Object> userMap = mapper.readValue(message, Map.class);
 
@@ -31,7 +31,7 @@ public class UserConsumer {
             String email = (String) userMap.get("email");
             String username = (String) userMap.get("username");
 
-            LOGGER.info(String.format("Message received for user %s, with email - %s", username, email));
+            log.info(String.format("Message received for user %s, with email - %s", username, email));
         } catch (Exception e) {
             e.printStackTrace();
         }
