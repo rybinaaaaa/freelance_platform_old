@@ -6,7 +6,8 @@ import freelanceplatform.data.UserRepository;
 import freelanceplatform.dto.Mapper;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
-import freelanceplatform.kafka.UserChangesProducer;
+import freelanceplatform.kafka.ChangesProducer;
+import freelanceplatform.kafka.topics.UserChangesTopic;
 import freelanceplatform.model.Proposal;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
@@ -37,12 +38,12 @@ public class UserService {
     private final ResumeRepository resumeRepository;
     private final ProposalRepository proposalRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserChangesProducer userChangesProducer;
+    private final ChangesProducer<UserChangesTopic> userChangesProducer;
     private final Mapper mapper;
 
     @Autowired
     public UserService(UserRepository userRepository, ResumeRepository resumeRepository, ProposalRepository proposalRepository,
-                       PasswordEncoder passwordEncoder, UserChangesProducer userChangesProducer, @Lazy Mapper mapper) {
+                       PasswordEncoder passwordEncoder, ChangesProducer<UserChangesTopic> userChangesProducer, @Lazy Mapper mapper) {
         this.userRepository = userRepository;
         this.resumeRepository = resumeRepository;
         this.proposalRepository = proposalRepository;
