@@ -6,7 +6,7 @@ import freelanceplatform.data.TaskRepository;
 import freelanceplatform.data.UserRepository;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
-import freelanceplatform.kafka.TaskChangesProducer;
+import freelanceplatform.kafka.ChangesProducer;
 import freelanceplatform.kafka.topics.TaskChangesTopic;
 import freelanceplatform.model.*;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static freelanceplatform.kafka.topics.TaskChangesTopic.TaskPosted;
+import static freelanceplatform.kafka.topics.TaskChangesTopic.*;
 
 
 @Service
@@ -34,10 +34,10 @@ public class TaskService {
     private final TaskRepository taskRepo;
     private final UserRepository userRepo;
     private final SolutionRepository solutionRepo;
-    private final TaskChangesProducer taskChangesProducer;
+    private final ChangesProducer<TaskChangesTopic> taskChangesProducer;
 
     @Autowired
-    public TaskService(TaskRepository taskRepo, UserRepository userRepo, SolutionRepository solutionRepo, TaskChangesProducer taskChangesProducer) {
+    public TaskService(TaskRepository taskRepo, UserRepository userRepo, SolutionRepository solutionRepo, ChangesProducer<TaskChangesTopic> taskChangesProducer) {
         this.taskRepo = taskRepo;
         this.userRepo = userRepo;
         this.solutionRepo = solutionRepo;
@@ -253,6 +253,7 @@ public class TaskService {
         freelancer.addTaskToTaken(task);
         taskRepo.save(task);
         userRepo.save(freelancer);
+        taskChangesProducer.sendMessage(String.format("Freelancer %s was assigned to task %s", freelancer.getUsername() , task.getTitle()), FreelancerAssigned);
     }
 
     /**
@@ -264,8 +265,10 @@ public class TaskService {
     @CachePut(key = "#task.id")
     public void accept(Task task){
         Objects.requireNonNull(task);
+        Objects.requireNonNull(task.getSolution());
         task.setStatus(TaskStatus.ACCEPTED);
         taskRepo.save(task);
+        taskChangesProducer.sendMessage(String.format("Task %s was accepted by customer %s",task.getTitle(), task.getCustomer().getUsername()), FreelancerAssigned);
     }
 
     /**
@@ -277,14 +280,16 @@ public class TaskService {
     @Transactional
     @CachePut(key = "#task.id")
     public void removeFreelancer(Task task){
+        final User freelancer = task.getFreelancer();
         Objects.requireNonNull(task);
-        task.getFreelancer().removeTakenTask(task);
+        freelancer.removeTakenTask(task);
         userRepo.save(task.getFreelancer());
         task.setStatus(TaskStatus.UNASSIGNED);
         task.setFreelancer(null);
         task.setAssignedDate(null);
         task.setSubmittedDate(null);
         taskRepo.save(task);
+        taskChangesProducer.sendMessage(String.format("Freelancer %s was removed from task %s", freelancer.getUsername(), task.getTitle()), FreelancerRemoved);
     }
 
     /**
@@ -315,5 +320,6 @@ public class TaskService {
         task.setStatus(TaskStatus.SUBMITTED);
         task.setSubmittedDate(LocalDateTime.now());
         taskRepo.save(task);
+        taskChangesProducer.sendMessage(String.format("Task %s was send on review by freelancer %s", task.getTitle(), task.getFreelancer().getUsername()), FreelancerRemoved);
     }
 }
