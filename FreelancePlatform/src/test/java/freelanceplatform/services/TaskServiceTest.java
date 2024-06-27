@@ -83,6 +83,13 @@ public class TaskServiceTest extends IntegrationTestBase {
     }
 
     @Test
+    public void getByIdReturnsTaskWithCorrectId(){
+        Integer id = taskService.getById(1).getId();
+        Task task = taskService.getById(id);
+        assertEquals(id, task.getId());
+    }
+
+    @Test
     public void updateThrowsValidationExceptionIfTaskStatusIsNotUnassigned(){
         task.setStatus(TaskStatus.SUBMITTED);
         taskRepo.save(task);

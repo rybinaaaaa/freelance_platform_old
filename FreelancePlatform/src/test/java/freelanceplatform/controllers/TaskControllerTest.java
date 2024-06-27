@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -52,17 +53,21 @@ public class TaskControllerTest extends IntegrationTestBase {
     private User userAdmin;
     private User emptyUser;
 
+    private final CacheManager cacheManager;
+
 
     @Autowired
-    public TaskControllerTest(MockMvc mockMvc, ObjectMapper objectMapper, TaskService taskService, UserService userService) {
+    public TaskControllerTest(MockMvc mockMvc, ObjectMapper objectMapper, TaskService taskService, UserService userService, CacheManager cacheManager) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.taskService = taskService;
         this.userService = userService;
+        this.cacheManager = cacheManager;
     }
 
     @BeforeEach
     public void init() {
+        clearAllCaches();
         userAdmin = Generator.generateUser();
         userAdmin.setRole(Role.ADMIN);
         userService.save(userAdmin);
@@ -70,6 +75,10 @@ public class TaskControllerTest extends IntegrationTestBase {
         emptyUser = Generator.generateUser();
         emptyUser.setRole(Role.USER);
         userService.save(emptyUser);
+    }
+
+    private void clearAllCaches() {
+        cacheManager.getCacheNames().forEach(cacheName -> cacheManager.getCache(cacheName).clear());
     }
 
     @Test
@@ -295,7 +304,11 @@ public class TaskControllerTest extends IntegrationTestBase {
 
     @Test
     public void deleteByAdminReturnsStatusNoContent() throws Exception{
-        mockMvc.perform(delete("/rest/tasks/posted/1")
+        Task task = Generator.generateTask();
+        task.setCustomer(userAdmin);
+        taskService.save(task);
+
+        mockMvc.perform(delete("/rest/tasks/posted/"+task.getId())
                         .with(user(new UserDetails(userAdmin))))
                 .andExpect(status().isNoContent());
     }
