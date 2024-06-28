@@ -4,7 +4,9 @@ import freelanceplatform.controllers.util.RestUtils;
 import freelanceplatform.dto.Mapper;
 import freelanceplatform.dto.entityCreationDTO.UserCreationDTO;
 import freelanceplatform.dto.entityDTO.UserDTO;
+import freelanceplatform.exceptions.ErrorResponse;
 import freelanceplatform.exceptions.NotFoundException;
+import freelanceplatform.exceptions.ValidationException;
 import freelanceplatform.model.Resume;
 import freelanceplatform.model.User;
 import freelanceplatform.security.model.UserDetails;
@@ -21,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,6 +117,22 @@ public class UserController {
         userService.save(user);
         final HttpHeaders headers = RestUtils.createLocationHeaderFromCurrentUri("/current");
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    }
+
+    /**
+     * Handles error when created existed user
+     * @param ex validation exception
+     * @return response with conflict status
+     */
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorResponse> handleUserValidationException(ValidationException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setStatus(HttpStatus.CONFLICT.value());
+        errorResponse.setError("Conflict");
+        errorResponse.setMessage(ex.getMessage());
+        errorResponse.setPath("/rest/users");
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     /**

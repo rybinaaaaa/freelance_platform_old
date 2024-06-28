@@ -112,6 +112,9 @@ public class UserService {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new ValidationException("User with this username is already exist");
         }
+        if (userRepository.existsByEmail(user.getEmail())){
+            throw new ValidationException("User with this email is already exist");
+        }
         user.encodePassword(passwordEncoder);
         userRepository.save(user);
         userChangesProducer.sendMessage(mapper.convertUserToJson(user), UserCreated);
