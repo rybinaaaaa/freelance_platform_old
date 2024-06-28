@@ -1,39 +1,71 @@
 package notificationService.consumers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import notificationService.notificationStrategies.SendAllUsersStrategy;
+import notificationService.notificationStrategies.SendCustomerStrategy;
+import notificationService.notificationStrategies.SendEmailStrategy;
+import notificationService.notificationStrategies.SendFreelancerStrategy;
+import notificationService.service.EmailSenderService;
+import notificationService.service.NotificationSender;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Map;
+
 
 @Slf4j
-@Service
-public class UserChangesConsumer {
+@Component
+public class UserChangesConsumer extends ChangesConsumer {
 
-    private final ObjectMapper mapper;
-
-    @Autowired
-    public UserChangesConsumer(ObjectMapper mapper) {
-        this.mapper = mapper;
+    public UserChangesConsumer(ObjectMapper mapper, NotificationSender notificationSender, EmailSenderService emailSenderService, WebClient webClient) {
+        super(mapper, notificationSender, emailSenderService, webClient);
     }
 
     @KafkaListener(
-            topics = "user_created",
+            topics = {"user_created","user_updated","user_deleted"},
             groupId = "myGroup"
     )
-    public void consumeUserChange(String message) {
-        try {
-            Map<String, Object> userMap = mapper.readValue(message, Map.class);
+    public void consumeChange(ConsumerRecord<String, String> record) throws JsonProcessingException {
+        String userJson = record.value();
+        log.info("Received message: {}", userJson);
+        String topic = record.topic();
 
-            // Извлечение данных по ключам
-            String email = (String) userMap.get("email");
-            String username = (String) userMap.get("username");
+        String username = mapper.readTree(userJson).get("username").asText();
 
-            log.info(String.format("Message received for user %s, with email - %s", username, email));
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        SendEmailStrategy sendEmailStrategy;
+        switch (topic) {
+            case "user_created" -> {
+                sendEmailStrategy = new SendCustomerStrategy(webClient, emailSenderService, mapper);
+                notificationSender.setStrategy(sendEmailStrategy);
+                notificationSender.sendEmail(
+                        null,
+                        userJson,
+                        "Your account has been created!",
+                        String.format("Congratulations! You have successfully created your account : '%s'", username));
+            }
+            case "user_updated" -> {
+                sendEmailStrategy = new SendCustomerStrategy(webClient, emailSenderService, mapper);
+                notificationSender.setStrategy(sendEmailStrategy);
+                notificationSender.sendEmail(
+                        null,
+                        userJson,
+                        "Your profile has been updated!",
+                        String.format("Your profile '%s' has been successfully updated' ", username));
+            }
+            case "user_deleted" -> {
+                sendEmailStrategy = new SendCustomerStrategy(webClient, emailSenderService, mapper);
+                notificationSender.setStrategy(sendEmailStrategy);
+                notificationSender.sendEmail(
+                        null,
+                        userJson,
+                        "Your account has been deleted",
+                        String.format("Your account '%s' has been successfully deleted' ", username));
+            }
+
         }
     }
 

@@ -1,3 +1,19 @@
+#spring:
+#  application:
+#    name: FreelancePlatform
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#  datasource:
+#    driver-class-name: org.postgresql.Driver
+#    url: jdbc:postgresql://localhost:5432/postgres
+#    username: postgres
+#  kafka:
+#    bootstrap-servers: localhost:9092
+#    producer:
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 spring:
   application:
     name: FreelancePlatform

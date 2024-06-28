@@ -1,6 +1,8 @@
 package freelanceplatform.services;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import freelanceplatform.data.SolutionRepository;
 import freelanceplatform.data.TaskRepository;
 import freelanceplatform.data.UserRepository;
@@ -54,7 +56,7 @@ public class TaskService {
     public void save(Task task){
         Objects.requireNonNull(task);
         taskRepo.save(task);
-        taskChangesProducer.sendMessage(String.format("Task %s create", task.getTitle()), TaskPosted);
+        taskChangesProducer.sendMessage(taskChangesProducer.toJsonString(task), TaskPosted);
     }
 
     /**
@@ -253,7 +255,7 @@ public class TaskService {
         freelancer.addTaskToTaken(task);
         taskRepo.save(task);
         userRepo.save(freelancer);
-        taskChangesProducer.sendMessage(String.format("Freelancer %s was assigned to task %s", freelancer.getUsername() , task.getTitle()), FreelancerAssigned);
+        taskChangesProducer.sendMessage(taskChangesProducer.toJsonString(task), FreelancerAssigned);
     }
 
     /**
@@ -268,7 +270,7 @@ public class TaskService {
         Objects.requireNonNull(task.getSolution());
         task.setStatus(TaskStatus.ACCEPTED);
         taskRepo.save(task);
-        taskChangesProducer.sendMessage(String.format("Task %s was accepted by customer %s",task.getTitle(), task.getCustomer().getUsername()), FreelancerAssigned);
+        taskChangesProducer.sendMessage(taskChangesProducer.toJsonString(task), TaskAccepted);
     }
 
     /**
@@ -284,12 +286,12 @@ public class TaskService {
         Objects.requireNonNull(task);
         freelancer.removeTakenTask(task);
         userRepo.save(task.getFreelancer());
+        taskChangesProducer.sendMessage(taskChangesProducer.toJsonString(task), FreelancerRemoved);
         task.setStatus(TaskStatus.UNASSIGNED);
         task.setFreelancer(null);
         task.setAssignedDate(null);
         task.setSubmittedDate(null);
         taskRepo.save(task);
-        taskChangesProducer.sendMessage(String.format("Freelancer %s was removed from task %s", freelancer.getUsername(), task.getTitle()), FreelancerRemoved);
     }
 
     /**
@@ -320,6 +322,6 @@ public class TaskService {
         task.setStatus(TaskStatus.SUBMITTED);
         task.setSubmittedDate(LocalDateTime.now());
         taskRepo.save(task);
-        taskChangesProducer.sendMessage(String.format("Task %s was send on review by freelancer %s", task.getTitle(), task.getFreelancer().getUsername()), FreelancerRemoved);
+        taskChangesProducer.sendMessage(taskChangesProducer.toJsonString(task), TaskSendOnReview);
     }
 }
