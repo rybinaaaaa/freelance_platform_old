@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 
-import static freelanceplatform.kafka.topics.UserChangesTopic.UserCreated;
+import static freelanceplatform.kafka.topics.UserChangesTopic.*;
 
 /**
  * The User service
@@ -114,7 +114,6 @@ public class UserService {
         }
         user.encodePassword(passwordEncoder);
         userRepository.save(user);
-//        userChangesProducer.sendMessage(USER_CREATED_TOPIC, mapper.convertUserToJson(user));
         userChangesProducer.sendMessage(mapper.convertUserToJson(user), UserCreated);
     }
 
@@ -130,6 +129,7 @@ public class UserService {
         if (exists(user.getId())) {
             user.encodePassword(passwordEncoder);
             System.out.println(user.toString());
+            userChangesProducer.sendMessage(mapper.convertUserToJson(user), UserUpdated);
             return userRepository.save(user);
         } else {
             throw new NotFoundException("User with id " + user.getId() + " not found");
@@ -146,6 +146,7 @@ public class UserService {
         Objects.requireNonNull(user);
         if (exists(user.getId())) {
             userRepository.delete(user);
+            userChangesProducer.sendMessage(mapper.convertUserToJson(user), UserDeleted);
         } else {
             throw new NotFoundException("User with id " + user.getId() + " not found");
         }

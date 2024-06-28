@@ -43,23 +43,23 @@ public class User extends AbstractEntity {
     @Column(nullable = false)
     private Role role;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Task> postedTasks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "freelancer", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Proposal> proposals = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "receiver", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Feedback> receivedFeedbacks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "sender", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Feedback> sentFeedbacks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "freelancer", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "freelancer", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Task> takenTasks = new ArrayList<>();
 
