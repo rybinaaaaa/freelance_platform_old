@@ -206,7 +206,7 @@ public class TaskControllerTest extends IntegrationTestBase {
         list.forEach(taskDTO -> assertEquals(taskDTO.getCustomerUsername(), emptyUser.getUsername()));
     }
 
-//    @Test
+    @Test
     public void updateReturnsNotFoundForWrongId() throws Exception{
         Task task = taskService.getById(1);
         task.setFreelancer(userAdmin);
@@ -224,6 +224,7 @@ public class TaskControllerTest extends IntegrationTestBase {
     public void updateReturnsBadRequestIfTaskStatusIsNotUnassigned() throws Exception{
         Task task = taskService.getById(1);
         task.setStatus(TaskStatus.ASSIGNED);
+        task.setCustomer(emptyUser);
         taskService.save(task);
         task.setTitle("New title");
         TaskCreationDTO taskDTO= new TaskCreationDTO(task.getCustomer(), task.getTitle(), task.getProblem(), task.getDeadline(), task.getStatus(), task.getPayment(), task.getType());
@@ -240,6 +241,7 @@ public class TaskControllerTest extends IntegrationTestBase {
     public void updateByUserReturnsStatusNoContent() throws Exception{
         Task task = taskService.getById(1);
         task.setStatus(TaskStatus.UNASSIGNED);
+        task.setCustomer(emptyUser);
         taskService.save(task);
         task.setTitle("New title");
         TaskCreationDTO taskDTO= new TaskCreationDTO(task.getCustomer(), task.getTitle(), task.getProblem(), task.getDeadline(), task.getStatus(), task.getPayment(), task.getType());
@@ -305,6 +307,9 @@ public class TaskControllerTest extends IntegrationTestBase {
 
 //    @Test
     public void deleteByUserReturnsStatusNoContent() throws Exception{
+        Task task = taskService.getById(1);
+        task.setCustomer(emptyUser);
+        taskService.save(task);
         mockMvc.perform(delete("/rest/tasks/posted/1")
                         .with(user(new UserDetails(emptyUser))))
                 .andExpect(status().isNoContent());
@@ -320,6 +325,9 @@ public class TaskControllerTest extends IntegrationTestBase {
 
 //    @Test
     public void assignFreelancerByUserReturnsStatusNoContent() throws Exception {
+        Task task = taskService.getById(1);
+        task.setCustomer(emptyUser);
+        taskService.save(task);
         mockMvc.perform(post("/rest/tasks/posted/1/proposals/1")
                         .with(user(new UserDetails(emptyUser))))
                 .andExpect(status().isNoContent());
@@ -342,6 +350,9 @@ public class TaskControllerTest extends IntegrationTestBase {
 
 //    @Test
     public void acceptByUserReturnsStatusNoContent() throws Exception{
+        Task task = taskService.getById(1);
+        task.setCustomer(emptyUser);
+        taskService.save(task);
         mockMvc.perform(post("/rest/tasks/posted/1/accept")
                         .with(user(new UserDetails(emptyUser))))
                 .andExpect(status().isNoContent());
@@ -364,14 +375,20 @@ public class TaskControllerTest extends IntegrationTestBase {
 
 //    @Test
     public void removeFreelancerByUserReturnsStatusNoContent() throws Exception{
-        mockMvc.perform(post("/rest/tasks/1")
+        Task task = taskService.getById(1);
+        task.setFreelancer(emptyUser);
+        taskService.save(task);
+        mockMvc.perform(post("/rest/tasks/1/remove-freelancer")
                         .with(user(new UserDetails(emptyUser))))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     public void removeFreelancerByAdminReturnsStatusForbidden() throws Exception{
-        mockMvc.perform(post("/rest/tasks/1")
+        Task task = taskService.getById(1);
+        task.setFreelancer(userAdmin);
+        taskService.save(task);
+        mockMvc.perform(post("/rest/tasks/1/remove-freelancer")
                         .with(user(new UserDetails(userAdmin))))
                 .andExpect(status().isForbidden());
     }
@@ -379,7 +396,10 @@ public class TaskControllerTest extends IntegrationTestBase {
     @Test
     public void removeFreelancerByGuestReturnsStatusForbidden() throws Exception{
         emptyUser.setRole(Role.GUEST);
-        mockMvc.perform(post("/rest/tasks/1")
+        Task task = taskService.getById(1);
+        task.setFreelancer(emptyUser);
+        taskService.save(task);
+        mockMvc.perform(post("/rest/tasks/1/remove-freelancer")
                         .with(user(new UserDetails(emptyUser))))
                 .andExpect(status().isForbidden());
     }
@@ -388,6 +408,10 @@ public class TaskControllerTest extends IntegrationTestBase {
     public void attachSolutionByUserReturnsStatusNoContent() throws Exception{
         final Solution solution = Generator.generateSolution();
         String solutionJson = objectMapper.writeValueAsString(solution);
+
+        Task task = taskService.getById(1);
+        task.setCustomer(emptyUser);
+        taskService.save(task);
 
         mockMvc.perform(post("/rest/tasks/taken/1/attach-solution")
                         .with(user(new UserDetails(emptyUser)))
