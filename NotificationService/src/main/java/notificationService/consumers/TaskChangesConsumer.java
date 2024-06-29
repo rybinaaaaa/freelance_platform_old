@@ -10,6 +10,7 @@ import notificationService.notificationStrategies.SendEmailStrategy;
 import notificationService.notificationStrategies.SendFreelancerStrategy;
 import notificationService.service.EmailSenderService;
 import notificationService.service.NotificationSender;
+import notificationService.service.UserService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -20,9 +21,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Component
 public class TaskChangesConsumer extends ChangesConsumer {
 
+    private final UserService userService;
+
     @Autowired
-    public TaskChangesConsumer(ObjectMapper mapper, NotificationSender notificationSender, EmailSenderService emailSenderService, WebClient webClient) {
+    public TaskChangesConsumer(ObjectMapper mapper, NotificationSender notificationSender, EmailSenderService emailSenderService, WebClient webClient, UserService userService) {
         super(mapper, notificationSender, emailSenderService, webClient);
+        this.userService = userService;
     }
 
     @KafkaListener(
@@ -44,7 +48,7 @@ public class TaskChangesConsumer extends ChangesConsumer {
         SendEmailStrategy sendEmailStrategy;
         switch (topic) {
             case "task_posted" -> {
-                sendEmailStrategy = new SendAllUsersStrategy(webClient, emailSenderService, mapper);
+                sendEmailStrategy = new SendAllUsersStrategy(webClient, emailSenderService, mapper, userService);
                 notificationSender.setStrategy(sendEmailStrategy);
                 notificationSender.sendEmail(
                         taskJson,

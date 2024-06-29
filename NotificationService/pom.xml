@@ -8,7 +8,7 @@
         <version>3.2.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-<!--    <groupId>com.example</groupId>-->
+    <groupId>freelancePlatform</groupId>
     <artifactId>NotificationService</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>NotificationService</name>
@@ -81,12 +81,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-        <dependency>
-            <groupId>freelancePlatform</groupId>
-            <artifactId>FreelancePlatform</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>freelancePlatform</groupId>-->
+<!--            <artifactId>FreelancePlatform</artifactId>-->
+<!--            <version>0.0.1-SNAPSHOT</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
 
     </dependencies>
 
