@@ -75,8 +75,6 @@ public class SecurityConfig {
 
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // Enable CORS
-                .cors(conf -> conf.configurationSource(corsConfigurationSource()))
                 .headers(customizer -> customizer.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 // Use custom success and failure handlers
                 .formLogin(fl -> fl.successHandler(authSuccess)
@@ -101,24 +99,5 @@ public class SecurityConfig {
      */
     private AuthenticationSuccess authenticationSuccess() {
         return new AuthenticationSuccess(objectMapper);
-    }
-
-    /**
-     * Configures the CORS settings to allow all methods from all origins.
-     * This makes the API accessible to other clients besides the UI.
-     * @return the CorsConfigurationSource with the CORS settings
-     */
-    private CorsConfigurationSource corsConfigurationSource() {
-        // We're allowing all methods from all origins so that the application API is usable also by other clients
-        // than just the UI.
-        // This behavior can be restricted later.
-        CorsConfiguration configuration = new CorsConfiguration();
-        // AllowCredentials requires a particular origin configured, * is rejected by the browser
-        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(List.of("*"));
-        configuration.addExposedHeader(HttpHeaders.LOCATION);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 }
