@@ -146,7 +146,7 @@ public class ProposalControllerTest extends IntegrationTestBase {
         userService.save(proposal.getFreelancer());
         taskService.save(proposal.getTask());
 
-        String pr = objectMapper.writeValueAsString(mapper.proposalToProposalDTO(proposal));
+        String pr = objectMapper.writeValueAsString(mapper.proposalToProposalCreationDTO(proposal));
 
         mockMvc.perform(post("/rest/proposals")
                         .with(user(new UserDetails(proposal.getFreelancer())))
@@ -161,7 +161,7 @@ public class ProposalControllerTest extends IntegrationTestBase {
         userService.save(proposal.getFreelancer());
         taskService.save(proposal.getTask());
 
-        String pr = objectMapper.writeValueAsString(mapper.proposalToProposalDTO(proposal));
+        String pr = objectMapper.writeValueAsString(mapper.proposalToProposalCreationDTO(proposal));
 
         mockMvc.perform(post("/rest/proposals")
                         .with(user(new UserDetails(userAdmin)))
@@ -172,8 +172,6 @@ public class ProposalControllerTest extends IntegrationTestBase {
 
     @Test
     void deleteByAdminReturnsStatusNoContent() throws Exception {
-        Proposal proposal = proposalService.findById(1).orElseThrow(() -> new NotFoundException("Incorrect id in tests!"));
-
         mockMvc.perform(delete("/rest/proposals/1")
                         .with(user(new UserDetails(userAdmin)))
                         .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8"))
@@ -182,8 +180,6 @@ public class ProposalControllerTest extends IntegrationTestBase {
 
     @Test
     void deleteByUserReturnsStatusForbidden() throws Exception {
-        Proposal proposal = proposalService.findById(1).orElseThrow(() -> new NotFoundException("Incorrect id in tests!"));
-
         mockMvc.perform(delete("/rest/proposals/1")
                         .with(user(new UserDetails(emptyUser)))
                         .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8"))

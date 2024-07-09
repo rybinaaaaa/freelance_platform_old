@@ -53,10 +53,11 @@ public class TaskService {
      */
     @CachePut(key = "#task.id")
     @Transactional
-    public void save(Task task){
+    public Task save(Task task){
         Objects.requireNonNull(task);
         taskRepo.save(task);
         taskChangesProducer.sendMessage(taskChangesProducer.toJsonString(task), TaskPosted);
+        return task;
     }
 
     /**
@@ -184,6 +185,11 @@ public class TaskService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<Task> findAll(){
+        return taskRepo.findAll();
+    }
+
     /**
      * Checks if a task with the given ID exists.
      *
@@ -204,12 +210,12 @@ public class TaskService {
      */
     @Transactional
     @CachePut(key = "#task.id")
-    public void update(Task task){
+    public Task update(Task task){
         Objects.requireNonNull(task);
         if (exists(task.getId())) {
             if (!task.getStatus().equals(TaskStatus.UNASSIGNED))
                 throw new ValidationException("Task can be updated only if it is unassigned");
-            taskRepo.save(task);
+            return taskRepo.save(task);
         } else {
             throw new NotFoundException("Task to update identified by " + task.getId() + " not found.");
         }
@@ -246,7 +252,7 @@ public class TaskService {
      */
     @Transactional
     @CachePut(key = "#task.id")
-    public void assignFreelancer(Task task, User freelancer){
+    public Task assignFreelancer(Task task, User freelancer){
         Objects.requireNonNull(task);
         Objects.requireNonNull(freelancer);
         task.setStatus(TaskStatus.ASSIGNED);
@@ -256,6 +262,8 @@ public class TaskService {
         taskRepo.save(task);
         userRepo.save(freelancer);
         taskChangesProducer.sendMessage(taskChangesProducer.toJsonString(task), FreelancerAssigned);
+
+        return task;
     }
 
     /**
@@ -265,12 +273,14 @@ public class TaskService {
      */
     @Transactional
     @CachePut(key = "#task.id")
-    public void accept(Task task){
+    public Task accept(Task task){
         Objects.requireNonNull(task);
         Objects.requireNonNull(task.getSolution());
         task.setStatus(TaskStatus.ACCEPTED);
         taskRepo.save(task);
         taskChangesProducer.sendMessage(taskChangesProducer.toJsonString(task), TaskAccepted);
+
+        return task;
     }
 
     /**
@@ -278,10 +288,9 @@ public class TaskService {
      *
      * @param task Task object to remove the freelancer from.
      */
-    //todo мейби добавить ограничения
     @Transactional
     @CachePut(key = "#task.id")
-    public void removeFreelancer(Task task){
+    public Task removeFreelancer(Task task){
         final User freelancer = task.getFreelancer();
         Objects.requireNonNull(task);
         freelancer.removeTakenTask(task);
@@ -292,23 +301,31 @@ public class TaskService {
         task.setAssignedDate(null);
         task.setSubmittedDate(null);
         taskRepo.save(task);
+
+        return task;
     }
 
     /**
      * Attaches a solution to a task.
      *
-     * @param task     Task object to attach the solution to.
+     * @param taskId     Task id to attach the solution to.
      * @param solution Solution object to attach.
      */
     @Transactional
-    @CachePut(key = "#task.id")
-    public void attachSolution(Task task, Solution solution){
+    @CachePut(key = "#taskId")
+    public Task attachSolution(Integer taskId, Solution solution){
+        Task task = taskRepo.findById(taskId).get();
+
         Objects.requireNonNull(task);
         Objects.requireNonNull(solution);
-        solution.setTask(task);
+
         task.setSolution(solution);
+        solution.setTask(task);
+
         taskRepo.save(task);
         solutionRepo.save(solution);
+
+        return task;
     }
 
     /**
@@ -318,10 +335,12 @@ public class TaskService {
      */
     @Transactional
     @CachePut(key = "#task.id")
-    public void senOnReview(Task task){
+    public Task senOnReview(Task task){
         task.setStatus(TaskStatus.SUBMITTED);
         task.setSubmittedDate(LocalDateTime.now());
         taskRepo.save(task);
         taskChangesProducer.sendMessage(taskChangesProducer.toJsonString(task), TaskSendOnReview);
+
+        return task;
     }
 }

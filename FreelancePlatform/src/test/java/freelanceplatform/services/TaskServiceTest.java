@@ -5,10 +5,8 @@ import freelanceplatform.data.UserRepository;
 import freelanceplatform.environment.Generator;
 import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.exceptions.ValidationException;
-import freelanceplatform.model.Role;
-import freelanceplatform.model.Task;
-import freelanceplatform.model.TaskStatus;
-import freelanceplatform.model.User;
+import freelanceplatform.model.*;
+import freelanceplatform.utils.CacheableTestBase;
 import freelanceplatform.utils.IntegrationTestBase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,12 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles("services")
-public class TaskServiceTest extends IntegrationTestBase {
+public class TaskServiceTest extends CacheableTestBase {
 
     @Autowired
     private TaskService taskService;
@@ -84,7 +83,8 @@ public class TaskServiceTest extends IntegrationTestBase {
 
     @Test
     public void getByIdReturnsTaskWithCorrectId(){
-        Integer id = taskService.getById(1).getId();
+//        Integer id = taskService.getById(1).getId();
+        Integer id = taskService.findAll().stream().findAny().map(Task::getId).orElse(null);
         Task task = taskService.getById(id);
         assertEquals(id, task.getId());
     }
@@ -147,4 +147,8 @@ public class TaskServiceTest extends IntegrationTestBase {
         assertFalse(freelancer.getTakenTasks().contains(task));
     }
 
+    @Override
+    protected String getCacheName() {
+        return "tasks";
+    }
 }

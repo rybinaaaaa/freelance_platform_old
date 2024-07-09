@@ -1,5 +1,6 @@
 package freelanceplatform.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class Solution extends AbstractEntity {
 
-    @OneToOne(mappedBy = "solution")
+    @OneToOne(mappedBy = "solution", cascade = CascadeType.ALL)
     private Task task;
 
     @Column

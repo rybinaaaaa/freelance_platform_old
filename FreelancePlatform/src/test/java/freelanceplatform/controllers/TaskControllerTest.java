@@ -220,7 +220,7 @@ public class TaskControllerTest extends IntegrationTestBase {
                 .andExpect(status().isNotFound());
     }
 
-//    @Test
+    @Test
     public void updateReturnsBadRequestIfTaskStatusIsNotUnassigned() throws Exception{
         Task task = taskService.getById(1);
         task.setStatus(TaskStatus.ASSIGNED);
@@ -237,7 +237,7 @@ public class TaskControllerTest extends IntegrationTestBase {
                 .andExpect(status().isBadRequest());
     }
 
-//    @Test
+    @Test
     public void updateByUserReturnsStatusNoContent() throws Exception{
         Task task = taskService.getById(1);
         task.setStatus(TaskStatus.UNASSIGNED);
@@ -294,7 +294,7 @@ public class TaskControllerTest extends IntegrationTestBase {
                 .andExpect(status().isNotFound());
     }
 
-//    @Test
+    @Test
     public void deleteByAdminReturnsStatusNoContent() throws Exception{
         Task task = Generator.generateTask();
         task.setCustomer(userAdmin);
@@ -305,7 +305,7 @@ public class TaskControllerTest extends IntegrationTestBase {
                 .andExpect(status().isNoContent());
     }
 
-//    @Test
+    @Test
     public void deleteByUserReturnsStatusNoContent() throws Exception{
         Task task = taskService.getById(1);
         task.setCustomer(emptyUser);
@@ -323,7 +323,8 @@ public class TaskControllerTest extends IntegrationTestBase {
                 .andExpect(status().isForbidden());
     }
 
-//    @Test
+    @Test
+    //todo
     public void assignFreelancerByUserReturnsStatusNoContent() throws Exception {
         Task task = taskService.getById(1);
         task.setCustomer(emptyUser);
@@ -348,10 +349,11 @@ public class TaskControllerTest extends IntegrationTestBase {
                 .andExpect(status().isForbidden());
     }
 
-//    @Test
+    @Test
     public void acceptByUserReturnsStatusNoContent() throws Exception{
         Task task = taskService.getById(1);
         task.setCustomer(emptyUser);
+        task.setSolution(Generator.generateSolution());
         taskService.save(task);
         mockMvc.perform(post("/rest/tasks/posted/1/accept")
                         .with(user(new UserDetails(emptyUser))))
@@ -373,10 +375,11 @@ public class TaskControllerTest extends IntegrationTestBase {
                 .andExpect(status().isForbidden());
     }
 
-//    @Test
+    @Test
     public void removeFreelancerByUserReturnsStatusNoContent() throws Exception{
         Task task = taskService.getById(1);
         task.setFreelancer(emptyUser);
+        task.setCustomer(emptyUser);
         taskService.save(task);
         mockMvc.perform(post("/rest/tasks/1/remove-freelancer")
                         .with(user(new UserDetails(emptyUser))))
@@ -404,15 +407,16 @@ public class TaskControllerTest extends IntegrationTestBase {
                 .andExpect(status().isForbidden());
     }
 
-//    @Test
+    @Test
     public void attachSolutionByUserReturnsStatusNoContent() throws Exception{
         final Solution solution = Generator.generateSolution();
-        String solutionJson = objectMapper.writeValueAsString(solution);
 
         Task task = taskService.getById(1);
         task.setCustomer(emptyUser);
+        solution.setTask(task);
         taskService.save(task);
 
+        String solutionJson = objectMapper.writeValueAsString(solution);
         mockMvc.perform(post("/rest/tasks/taken/1/attach-solution")
                         .with(user(new UserDetails(emptyUser)))
                         .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")

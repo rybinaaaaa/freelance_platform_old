@@ -23,6 +23,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
 public class SolutionControllerTests extends IntegrationTestBase {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
@@ -32,6 +34,7 @@ public class SolutionControllerTests extends IntegrationTestBase {
     private User userAdmin;
     private User emptyUser;
     private Task task;
+
     @Autowired
     public SolutionControllerTests(MockMvc mockMvc, ObjectMapper objectMapper, SolutionService solutionService, UserService userService, TaskService taskService) {
         this.mockMvc = mockMvc;
@@ -40,33 +43,39 @@ public class SolutionControllerTests extends IntegrationTestBase {
         this.userService = userService;
         this.taskService = taskService;
     }
+
     @BeforeEach
     public void init() {
         userAdmin = Generator.generateUser();
         userAdmin.setRole(Role.ADMIN);
         userService.save(userAdmin);
+
         emptyUser = Generator.generateUser();
         emptyUser.setRole(Role.USER);
         userService.save(emptyUser);
+
         task = Generator.generateTask();
         task.setCustomer(emptyUser);
         taskService.save(task);
     }
+
     //todo resolve insertion problem
-//    @Test
-    public void saveByUserReturnsStatusCreated() throws Exception{
+    @Test
+    public void saveByUserReturnsStatusCreated() throws Exception {
         Solution solution = Generator.generateSolution();
         solution.setTask(taskService.getById(1));
         String solutionJson = objectMapper.writeValueAsString(solution);
+
         mockMvc.perform(post("/rest/solutions")
                         .with(user(new UserDetails(emptyUser)))
                         .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                         .content(solutionJson).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
     }
+
     //todo resolve insertion problem
     @Test
-    public void saveByAdminReturnsStatusForbidden() throws Exception{
+    public void saveByAdminReturnsStatusForbidden() throws Exception {
         Solution solution = Generator.generateSolution();
         String solutionJson = objectMapper.writeValueAsString(solution);
         mockMvc.perform(post("/rest/solutions")
@@ -75,9 +84,10 @@ public class SolutionControllerTests extends IntegrationTestBase {
                         .content(solutionJson).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
+
     //todo resolve insertion problem
     @Test
-    public void saveByGuestReturnsStatusForbidden() throws Exception{
+    public void saveByGuestReturnsStatusForbidden() throws Exception {
         emptyUser.setRole(Role.GUEST);
         Solution solution = Generator.generateSolution();
         String solutionJson = objectMapper.writeValueAsString(solution);
@@ -87,19 +97,22 @@ public class SolutionControllerTests extends IntegrationTestBase {
                         .content(solutionJson).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
+
     @Test
-    public void getByIdReturnsStatusOk() throws Exception{
+    public void getByIdReturnsStatusOk() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/rest/solutions/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", equalTo(1)));
     }
+
     @Test
-    public void getByIdReturnsNotFoundForUnknownId() throws Exception{
+    public void getByIdReturnsNotFoundForUnknownId() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/rest/solutions/-1"))
                 .andExpect(status().isNotFound());
     }
+
     @Test
-    public void updateReturnsNotFoundForWrongId() throws Exception{
+    public void updateReturnsNotFoundForWrongId() throws Exception {
         Solution solution = solutionService.getById(1);
         solution.setDescription("new description");
         String solutionJson = objectMapper.writeValueAsString(solution);
@@ -109,11 +122,13 @@ public class SolutionControllerTests extends IntegrationTestBase {
                         .content(solutionJson).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
-//    @Test
-    public void updateByUserReturnsStatusNoContent() throws Exception{
+
+    @Test
+    public void updateByUserReturnsStatusNoContent() throws Exception {
         Solution solution = solutionService.getById(1);
         solution.setTask(task);
         task.setSolution(solution);
+        task.setFreelancer(emptyUser);
         taskService.save(task);
         solutionService.save(solution);
         solution.setDescription("new description");
@@ -124,8 +139,9 @@ public class SolutionControllerTests extends IntegrationTestBase {
                         .content(solutionJson).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
+
     @Test
-    public void updateByAdminReturnsStatusForbidden() throws Exception{
+    public void updateByAdminReturnsStatusForbidden() throws Exception {
         Solution solution = solutionService.getById(1);
         solution.setDescription("new description");
         String solutionJson = objectMapper.writeValueAsString(solution);
@@ -135,8 +151,9 @@ public class SolutionControllerTests extends IntegrationTestBase {
                         .content(solutionJson).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
+
     @Test
-    public void updateByGuestReturnsStatusForbidden() throws Exception{
+    public void updateByGuestReturnsStatusForbidden() throws Exception {
         emptyUser.setRole(Role.GUEST);
         Solution solution = solutionService.getById(1);
         solution.setDescription("new description");
@@ -147,30 +164,43 @@ public class SolutionControllerTests extends IntegrationTestBase {
                         .content(solutionJson).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
+
     @Test
-    public void deleteReturnsNotFoundForWrongId() throws Exception{
+    public void deleteReturnsNotFoundForWrongId() throws Exception {
         mockMvc.perform(delete("/rest/solutions/-1")
                         .with(user(new UserDetails(emptyUser))))
                 .andExpect(status().isNotFound());
     }
+
     @Test
-    public void deleteByAdminReturnsStatusForbidden() throws Exception{
+    public void deleteByAdminReturnsStatusForbidden() throws Exception {
         mockMvc.perform(delete("/rest/solutions/1")
                         .with(user(new UserDetails(userAdmin))))
                 .andExpect(status().isForbidden());
     }
+
     @Test
-    public void deleteByGuestReturnsStatusForbidden() throws Exception{
+    public void deleteByGuestReturnsStatusForbidden() throws Exception {
         emptyUser.setRole(Role.GUEST);
         mockMvc.perform(delete("/rest/solutions/1")
                         .with(user(new UserDetails(emptyUser))))
                 .andExpect(status().isForbidden());
     }
-//    @Test
-    public void deleteByUserReturnsStatusNoContent() throws Exception{
+
+    @Test
+    public void deleteByUserReturnsStatusNoContent() throws Exception {
+
         Solution solution = solutionService.getById(1);
+
+        task.setFreelancer(emptyUser);
+        task.setCustomer(userAdmin);
+        task.setSolution(solution);
+
+        taskService.save(task);
+
         solution.setTask(task);
         solutionService.save(solution);
+
         mockMvc.perform(delete("/rest/solutions/1")
                         .with(user(new UserDetails(emptyUser))))
                 .andExpect(status().isNoContent());

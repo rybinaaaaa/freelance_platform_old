@@ -65,7 +65,7 @@ public class UserControllerTest extends BaseControllerTest{
     public void registerSavesByUsingUserService() throws Exception {
         final User user = Generator.generateUser();
         UserCreationDTO userCreationDTO = new UserCreationDTO(user.getUsername(), user.getFirstName(),
-                user.getLastName(), user.getEmail(), user.getPassword(), user.getRole());
+                user.getLastName(), user.getEmail(), user.getPassword());
         User savedUser = mapper.userDTOToUser(userCreationDTO);
         mockMvc.perform(post("/rest/users")
                         .content(toJson(userCreationDTO))

@@ -9,6 +9,7 @@ import freelanceplatform.exceptions.NotFoundException;
 import freelanceplatform.model.Role;
 import freelanceplatform.model.Solution;
 import freelanceplatform.model.Task;
+import freelanceplatform.utils.CacheableTestBase;
 import freelanceplatform.utils.IntegrationTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,39 +41,41 @@ public class SolutionServiceTest extends IntegrationTestBase {
     private Task task;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         solution = Generator.generateSolution();
+
         task = Generator.generateTask();
         task.setCustomer(Generator.generateUser());
         task.getCustomer().setRole(Role.USER);
-        task.setSolution(solution);
+
         solution.setTask(task);
+        task.setSolution(solution);
         solutionRepo.save(solution);
+
         userRepo.save(task.getCustomer());
-        taskRepo.save(task);
     }
 
     @Test
-    public void getThrowsNotFoundExceptionIfIdIsWrong(){
+    public void getThrowsNotFoundExceptionIfIdIsWrong() {
         assertThrows(NotFoundException.class, () -> solutionService.getById(-1));
     }
 
     @Test
-    public void updateThrowsNotFoundExceptionIfIdIsWrong(){
+    public void updateThrowsNotFoundExceptionIfIdIsWrong() {
         solution = Generator.generateSolution();
         solution.setId(-1);
         assertThrows(NotFoundException.class, () -> solutionService.update(solution));
     }
 
     @Test
-    public void deleteThrowsNotFoundExceptionIfIdIsWrong(){
+    public void deleteThrowsNotFoundExceptionIfIdIsWrong() {
         solution = Generator.generateSolution();
         solution.setId(-1);
         assertThrows(NotFoundException.class, () -> solutionService.delete(solution));
     }
 
     @Test
-    public void deleteRemovesSolutionFromTask(){
+    public void deleteRemovesSolutionFromTask() {
         solutionService.delete(solution);
         assertNull(task.getSolution());
     }

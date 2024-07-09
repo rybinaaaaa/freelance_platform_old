@@ -23,9 +23,12 @@ spring:
     show-sql: true
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://pg-23908f36-stskovalchuk-5e6f.e.aivencloud.com:26185/defaultdb
-    username: avnadmin
-    password: AVNS_CFKlOW6MPWhx7lRowWi
+#    url: jdbc:postgresql://pg-23908f36-stskovalchuk-5e6f.e.aivencloud.com:26185/defaultdb
+#    username: avnadmin
+#    password: AVNS_CFKlOW6MPWhx7lRowWi
+    url: jdbc:postgresql://localhost:5432/mydatabase
+    username: myuser
+    password: secret
   kafka:
     bootstrap-servers: localhost:9092
     producer:

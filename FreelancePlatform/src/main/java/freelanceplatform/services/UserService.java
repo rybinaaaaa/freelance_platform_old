@@ -107,7 +107,8 @@ public class UserService {
      * @param user to save
      */
     @Transactional
-    public void save(User user){
+    @CachePut(key = "#user.id")
+    public User save(User user){
         Objects.requireNonNull(user);
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new ValidationException("User with this username is already exist");
@@ -118,6 +119,8 @@ public class UserService {
         user.encodePassword(passwordEncoder);
         userRepository.save(user);
         userChangesProducer.sendMessage(mapper.convertUserToJson(user), UserCreated);
+
+        return user;
     }
 
     /**
@@ -131,7 +134,7 @@ public class UserService {
         Objects.requireNonNull(user);
         if (exists(user.getId())) {
             user.encodePassword(passwordEncoder);
-            System.out.println(user.toString());
+            System.out.println(user);
             userChangesProducer.sendMessage(mapper.convertUserToJson(user), UserUpdated);
             return userRepository.save(user);
         } else {
@@ -192,5 +195,4 @@ public class UserService {
         if (resume.isEmpty()) throw new NotFoundException("Resume for user with id " + user.getId() + " not found");
         return resume.get();
     }
-
 }

@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,23 +42,23 @@ public class User extends AbstractEntity {
     @Column(nullable = false)
     private Role role;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     @JsonIgnore
     private List<Task> postedTasks = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "freelancer", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "freelancer", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Proposal> proposals = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "receiver", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "receiver", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Feedback> receivedFeedbacks = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "sender", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "sender", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Feedback> sentFeedbacks = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "freelancer", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "freelancer")
     @JsonIgnore
     private List<Task> takenTasks = new ArrayList<>();
 

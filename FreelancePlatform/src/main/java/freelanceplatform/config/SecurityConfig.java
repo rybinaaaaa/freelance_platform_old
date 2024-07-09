@@ -38,6 +38,7 @@ public class SecurityConfig {
 
     /**
      * Constructs the SecurityConfig with the necessary dependencies
+     *
      * @param objectMapper the ObjectMapper used for JSON conversion
      */
     public SecurityConfig(ObjectMapper objectMapper) {
@@ -46,6 +47,7 @@ public class SecurityConfig {
 
     /**
      * Provides a PasswordEncoder bean that uses BCrypt hashing algorithm
+     *
      * @return the PasswordEncoder bean
      */
     @Bean
@@ -60,6 +62,7 @@ public class SecurityConfig {
      * Disables CSRF protection.
      * Enables CORS with permissive settings.
      * Configures custom success and failure handlers for form login.
+     *
      * @param http the HttpSecurity to modify
      * @return the configured SecurityFilterChain
      * @throws Exception in case of any configuration errors
@@ -72,9 +75,7 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 // Return 401 by default when attempting to access a secured endpoint
                 .exceptionHandling(ehc -> ehc.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-
                 .csrf(AbstractHttpConfigurer::disable)
-
                 .headers(customizer -> customizer.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 // Use custom success and failure handlers
                 .formLogin(fl -> fl.successHandler(authSuccess)
@@ -87,6 +88,7 @@ public class SecurityConfig {
 
     /**
      * Creates an instance of AuthenticationFailure handler.
+     *
      * @return the AuthenticationFailure handler
      */
     private AuthenticationFailure authenticationFailureHandler() {
@@ -95,6 +97,7 @@ public class SecurityConfig {
 
     /**
      * Creates an instance of AuthenticationSuccess handler.
+     *
      * @return the AuthenticationSuccess handler
      */
     private AuthenticationSuccess authenticationSuccess() {
